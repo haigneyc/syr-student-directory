@@ -5,6 +5,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
+import MobileRefreshWrapper from '@/components/MobileRefreshWrapper';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -55,11 +56,13 @@ export default function RootLayout({
       <body className={`${inter.className} antialiased bg-gray-50`}>
         <GoogleAnalytics />
         <ServiceWorkerRegistration />
-        <div className="flex flex-col min-h-screen">
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </div>
+        <MobileRefreshWrapper>
+          <div className="flex flex-col min-h-screen">
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
+        </MobileRefreshWrapper>
       </body>
     </html>
   );

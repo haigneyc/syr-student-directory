@@ -60,7 +60,7 @@
 ## Mobile Experience
 - [x] Add PWA manifest for "Add to Home Screen"
 - [x] Implement service worker for offline support
-- [ ] Add pull-to-refresh on mobile
+- [x] Add pull-to-refresh on mobile
 
 ## Content
 - [ ] Gather 50+ real Syracuse student discounts
