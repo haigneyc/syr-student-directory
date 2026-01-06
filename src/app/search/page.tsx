@@ -1,16 +1,15 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import DealCard from '@/components/DealCard';
-import { getAllDeals, getAllCategories } from '@/lib/data';
 import { DealWithRelations } from '@/types/database';
 import { Category } from '@/types/supabase';
 
 type DiscountType = 'all' | 'percentage' | 'fixed' | 'special';
 
-export default function SearchPage() {
+function SearchPageContent() {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
   const initialCategory = searchParams.get('category') || 'all';
@@ -21,8 +20,43 @@ export default function SearchPage() {
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [sortBy, setSortBy] = useState<'relevance' | 'newest' | 'discount'>('relevance');
 
-  const allDeals = useMemo(() => getAllDeals(), []);
-  const categories = useMemo(() => getAllCategories(), []);
+  // Data state - fetched from API
+  const [allDeals, setAllDeals] = useState<DealWithRelations[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch deals and categories from API
+  useEffect(() => {
+    async function fetchData() {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const [dealsRes, categoriesRes] = await Promise.all([
+          fetch('/api/deals'),
+          fetch('/api/categories'),
+        ]);
+
+        if (!dealsRes.ok || !categoriesRes.ok) {
+          throw new Error('Failed to fetch data');
+        }
+
+        const dealsData = await dealsRes.json();
+        const categoriesData = await categoriesRes.json();
+
+        setAllDeals(dealsData.deals || []);
+        setCategories(categoriesData.categories || []);
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        setError('Failed to load deals. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
 
   // Filter deals based on all criteria
   const filteredDeals = useMemo(() => {
@@ -83,19 +117,39 @@ export default function SearchPage() {
     window.history.replaceState({}, '', newUrl);
   }, [query, selectedCategory]);
 
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setQuery('');
     setSelectedCategory('all');
     setDiscountType('all');
     setVerifiedOnly(false);
     setSortBy('relevance');
-  };
+  }, []);
 
   const hasActiveFilters =
     query ||
     selectedCategory !== 'all' ||
     discountType !== 'all' ||
     verifiedOnly;
+
+  if (error) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-red-50 border border-red-200 rounded-xl p-8 text-center">
+          <div className="text-4xl mb-4">⚠️</div>
+          <h3 className="text-lg font-semibold text-red-900 mb-2">
+            Something went wrong
+          </h3>
+          <p className="text-red-700 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -219,16 +273,20 @@ export default function SearchPage() {
         <main className="lg:col-span-3 mt-8 lg:mt-0">
           {/* Results Count */}
           <div className="flex items-center justify-between mb-6">
-            <p className="text-gray-600">
-              {filteredDeals.length}{' '}
-              {filteredDeals.length === 1 ? 'deal' : 'deals'} found
-              {query && (
-                <span>
-                  {' '}
-                  for &quot;<span className="font-medium">{query}</span>&quot;
-                </span>
-              )}
-            </p>
+            {isLoading ? (
+              <p className="text-gray-600">Loading deals...</p>
+            ) : (
+              <p className="text-gray-600">
+                {filteredDeals.length}{' '}
+                {filteredDeals.length === 1 ? 'deal' : 'deals'} found
+                {query && (
+                  <span>
+                    {' '}
+                    for &quot;<span className="font-medium">{query}</span>&quot;
+                  </span>
+                )}
+              </p>
+            )}
 
             {/* Mobile filter indicator */}
             {hasActiveFilters && (
@@ -238,8 +296,29 @@ export default function SearchPage() {
             )}
           </div>
 
-          {/* Results Grid */}
-          {filteredDeals.length > 0 ? (
+          {/* Loading State */}
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[1, 2, 3, 4].map((i) => (
+                <div
+                  key={i}
+                  className="bg-white rounded-xl border border-gray-200 p-6 animate-pulse"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-gray-200 rounded-lg" />
+                    <div className="flex-1">
+                      <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
+                      <div className="h-3 bg-gray-200 rounded w-1/2" />
+                    </div>
+                  </div>
+                  <div className="mt-4 space-y-2">
+                    <div className="h-3 bg-gray-200 rounded" />
+                    <div className="h-3 bg-gray-200 rounded w-5/6" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : filteredDeals.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {filteredDeals.map((deal) => (
                 <DealCard key={deal.id} deal={deal} />
@@ -267,5 +346,20 @@ export default function SearchPage() {
         </main>
       </div>
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-48 mb-4" />
+          <div className="h-4 bg-gray-200 rounded w-64" />
+        </div>
+      </div>
+    }>
+      <SearchPageContent />
+    </Suspense>
   );
 }
