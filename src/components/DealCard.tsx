@@ -4,6 +4,7 @@ import { formatDate } from '@/lib/utils';
 import { isDealExpired } from '@/lib/expiration';
 import VerificationBadge from './VerificationBadge';
 import ExpirationBadge from './ExpirationBadge';
+import BusinessLogo from './BusinessLogo';
 
 interface DealCardProps {
   deal: DealWithRelations;
@@ -22,7 +23,12 @@ export default function DealCard({ deal, featured = false }: DealCardProps) {
     >
       <div className="p-5">
         {/* Header */}
-        <div className="flex items-start justify-between gap-3 mb-3">
+        <div className="flex items-start gap-3 mb-3">
+          <BusinessLogo
+            src={deal.business.logo_url}
+            alt={deal.business.name}
+            size="sm"
+          />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-lg">{deal.category.icon}</span>

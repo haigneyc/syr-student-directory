@@ -51,7 +51,7 @@
 
 ## Performance & Quality
 - [x] Add loading skeletons for better UX
-- [ ] Implement image optimization for business logos
+- [x] Implement image optimization for business logos
 - [x] Add error boundaries and fallback UI
 - [ ] Set up error tracking (Sentry)
 - [x] Add unit tests for utility functions
