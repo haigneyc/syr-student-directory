@@ -143,26 +143,34 @@ Legacy keys will be deprecated by late 2026. Plan to migrate to new keys.
 
 ### Google AdSense
 
-- [ ] Go to [adsense.google.com](https://adsense.google.com)
+- [x] Go to [adsense.google.com](https://adsense.google.com)
 
-- [ ] Sign up and add your site
+- [x] Sign up and add your site
 
-- [ ] Wait for approval (can take 1-2 weeks)
+- [x] Wait for approval (can take 1-2 weeks)
 
-- [ ] Once approved, get your Publisher ID
+- [x] Once approved, get your Publisher ID
 
-- [ ] Add to environment variables:
+- [x] Add to environment variables:
   ```env
   GOOGLE_ADSENSE_ID=ca-pub-XXXXXXXXXX
   ```
 
+  ```
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2466524479356522"
+     crossorigin="anonymous"></script>
+  ```
+
 ### Google Search Console
 
-- [ ] Go to [search.google.com/search-console](https://search.google.com/search-console)
+- [x] Go to [search.google.com/search-console](https://search.google.com/search-console)
 
-- [ ] Add your property (domain)
+- [x] Add your property (domain)
 
 - [ ] Verify ownership via DNS TXT record
+```
+google-site-verification=o9iQ_GCfsWW72FIuRHkcU0Mkrd_xfJ9UopItEHn9XZw
+```
 
 - [ ] Submit your sitemap: `https://yourdomain.com/sitemap.xml`
 
@@ -250,6 +258,103 @@ Legacy keys will be deprecated by late 2026. Plan to migrate to new keys.
 
 ---
 
+## 9. Stripe Setup (For Featured Listings)
+
+> Required for businesses to pay for featured listing placements
+
+- [ ] Go to [stripe.com](https://stripe.com) and create an account
+
+- [ ] Get your API keys from **Developers** → **API Keys**:
+  - Publishable key: `pk_live_...` or `pk_test_...`
+  - Secret key: `sk_live_...` or `sk_test_...`
+
+- [ ] Create a Product for "Featured Listing" in **Products**:
+  - Set pricing (e.g., $29/month or $249/year)
+  - Note the Price ID: `price_...`
+
+- [ ] Set up Webhook endpoint:
+  - URL: `https://yourdomain.com/api/webhooks/stripe`
+  - Events: `checkout.session.completed`, `customer.subscription.updated`
+  - Get webhook signing secret: `whsec_...`
+
+- [ ] Add to environment variables:
+  ```env
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_xxxxxxxxxxxx
+  STRIPE_SECRET_KEY=sk_live_xxxxxxxxxxxx
+  STRIPE_WEBHOOK_SECRET=whsec_xxxxxxxxxxxx
+  STRIPE_FEATURED_PRICE_ID=price_xxxxxxxxxxxx
+  ```
+
+---
+
+## 10. Error Tracking with Sentry (Optional)
+
+> Recommended for production error monitoring
+
+- [ ] Go to [sentry.io](https://sentry.io) and create an account (free tier available)
+
+- [ ] Create a new project:
+  - Platform: **Next.js**
+  - Name: `cuse-student-deals`
+
+- [ ] Get your DSN from **Settings** → **Client Keys (DSN)**
+
+- [ ] Add to environment variables:
+  ```env
+  NEXT_PUBLIC_SENTRY_DSN=https://xxxx@xxxx.ingest.sentry.io/xxxx
+  SENTRY_AUTH_TOKEN=sntrys_xxxxxxxxxxxx
+  ```
+
+---
+
+## 11. Admin API Key (For Bulk Import)
+
+> Required to use the `/api/deals/import` endpoint
+
+- [ ] Generate a secure random string for admin access:
+  ```bash
+  openssl rand -base64 32
+  ```
+
+- [ ] Add to environment variables:
+  ```env
+  ADMIN_API_KEY=your-secure-random-string
+  ```
+
+- [ ] Use in API requests:
+  ```bash
+  curl -X POST https://yourdomain.com/api/deals/import \
+    -H "Content-Type: application/json" \
+    -H "x-admin-key: your-secure-random-string" \
+    -d '{"deals": [...]}'
+  ```
+
+---
+
+## 12. Affiliate Program Setup (Optional)
+
+> For earning commissions on referral links
+
+### Amazon Associates
+
+- [ ] Sign up at [affiliate-program.amazon.com](https://affiliate-program.amazon.com)
+- [ ] Get your Associate Tag (e.g., `cusestudent-20`)
+- [ ] Add to environment variables:
+  ```env
+  NEXT_PUBLIC_AMAZON_AFFILIATE_TAG=cusestudent-20
+  ```
+
+### Apple Affiliate Program
+
+- [ ] Apply at [performance-partners.apple.com](https://performance-partners.apple.com)
+- [ ] Get your affiliate token
+- [ ] Add to environment variables:
+  ```env
+  NEXT_PUBLIC_APPLE_AFFILIATE_TOKEN=at_xxxxxxxxxxxx
+  ```
+
+---
+
 ## Quick Reference: All Environment Variables
 
 ```env
@@ -262,10 +367,28 @@ SUPABASE_SECRET_KEY=sb_secret_xxxxxxxxxxxx
 NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 
 # Optional - Ads
-GOOGLE_ADSENSE_ID=ca-pub-XXXXXXXXXX
+NEXT_PUBLIC_GOOGLE_ADSENSE_ID=ca-pub-XXXXXXXXXX
 
-# Optional - Email
+# Optional - Email (Transactional)
 RESEND_API_KEY=re_XXXXXXXXXX
+
+# Optional - Payments (Stripe)
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_xxxxxxxxxxxx
+STRIPE_SECRET_KEY=sk_live_xxxxxxxxxxxx
+STRIPE_WEBHOOK_SECRET=whsec_xxxxxxxxxxxx
+STRIPE_FEATURED_PRICE_ID=price_xxxxxxxxxxxx
+
+# Optional - Error Tracking (Sentry)
+NEXT_PUBLIC_SENTRY_DSN=https://xxxx@xxxx.ingest.sentry.io/xxxx
+SENTRY_AUTH_TOKEN=sntrys_xxxxxxxxxxxx
+
+# Optional - Admin Access
+ADMIN_API_KEY=your-secure-random-string
+
+# Optional - Affiliate Programs
+NEXT_PUBLIC_AMAZON_AFFILIATE_TAG=cusestudent-20
+NEXT_PUBLIC_APPLE_AFFILIATE_TOKEN=at_xxxxxxxxxxxx
+NEXT_PUBLIC_SPOTIFY_REF=your-spotify-ref
 ```
 
 ### Key Format Reference
