@@ -1,8 +1,12 @@
 # User Setup Tasks
 
-Non-code tasks that need to be completed to launch the site.
+> Non-code tasks that need to be completed to launch the site.
+>
+> **Organized by launch phases** to prevent "gold-plating" before launch.
 
 ---
+
+# Phase 1: Foundations (Blocking)
 
 ## 1. Domain Registration
 
@@ -11,7 +15,7 @@ Non-code tasks that need to be completed to launch the site.
 
 - [x] **Purchase the domain** (~$12/year for .com)
 
-- [ ] **Configure DNS** (will be done during Vercel deployment)
+- [x] **Configure DNS** (done during Vercel deployment)
 
 ---
 
@@ -40,6 +44,14 @@ Non-code tasks that need to be completed to launch the site.
 
 - [x] Verify tables were created in **Table Editor**
 
+### Security Configuration
+
+- [ ] **Enable RLS (Row Level Security)** on all public tables
+  - Go to **Authentication** → **Policies**
+  - Enable RLS for: `deals`, `businesses`, `categories`
+  - Add read policies for public access
+  - Add write policies for authenticated/admin only
+
 ### Get API Keys (New System - 2025+)
 
 > **Note**: Supabase has transitioned to a new API key system. New projects have both
@@ -67,6 +79,17 @@ Non-code tasks that need to be completed to launch the site.
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_xxxxxxxxxxxx
   SUPABASE_SECRET_KEY=sb_secret_xxxxxxxxxxxx
   ```
+
+### Backup Configuration
+
+- [ ] **Enable automated backups** in Supabase dashboard
+  - Go to **Settings** → **Database** → **Backups**
+  - Enable Point-in-Time Recovery (PITR) if on Pro plan
+  - Or ensure daily backups are enabled (free tier)
+
+- [ ] **Document recovery procedure** in a RECOVERY.md file
+
+- [ ] **Export schema snapshot** to repository for version control
 
 <details>
 <summary>Using Legacy Keys (not recommended for new projects)</summary>
@@ -110,73 +133,56 @@ Legacy keys will be deprecated by late 2026. Plan to migrate to new keys.
   - Add `A` record pointing to `76.76.21.21`
   - Add `CNAME` record for `www` pointing to `cname.vercel-dns.com`
 
-- [ ] Wait for SSL certificate (automatic, ~10 minutes)
+- [x] Wait for SSL certificate (automatic, ~10 minutes)
+
+### Domain Redirects
+
+- [ ] **Enforce HTTPS redirect** (Vercel does this by default, verify in settings)
+
+- [ ] **Configure www redirect**:
+  - Go to **Settings** → **Domains**
+  - Set up redirect from `www.orangediscounts.com` → `orangediscounts.com` (or vice versa)
+  - Choose one canonical domain and stick with it
 
 ---
 
-## 4. Google Services
+# Phase 2: Content & Trust (Launch-Blocking)
 
-### Google Analytics (Optional)
+## 4. Trust & Credibility Content
 
-- [x] Go to [analytics.google.com](https://analytics.google.com)
+> **Critical**: Students are extremely sensitive to scammy coupon sites.
 
-- [x] Create a new property for your domain
+### Create Trust Pages
 
-- [x] Get your Measurement ID (starts with `G-`)
+- [ ] **Update About page** with:
+  - Who runs the site (name/team, Syracuse connection)
+  - Why it exists (mission to help students save money)
+  - Why students should trust it (verification process, no fake deals)
+  - Clear disclaimer: "Not affiliated with Syracuse University"
 
-- [x] Add to environment variables:
-  ```env
-  NEXT_PUBLIC_GA_MEASUREMENT_ID=G-FGZJKQVVZ4
-  ```
+- [ ] **Create "How We Verify Deals" page** explaining:
+  - How deals are submitted
+  - How deals are verified (visited in person, called business, etc.)
+  - How often deals are re-verified
+  - How to report incorrect/expired deals
 
-  ```
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-FGZJKQVVZ4"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+- [ ] **Add contact email to footer**: `hello@orangediscounts.com`
 
-  gtag('config', 'G-FGZJKQVVZ4');
-</script>
-  ```
+### Legal Pages
 
-### Google AdSense
+- [x] Privacy Policy (created)
+- [x] Terms of Service (created)
+- [ ] **Add affiliate disclosure** (FTC requirement):
+  - Add disclosure on pages with affiliate links
+  - Example: "Some links may earn us a commission at no extra cost to you"
 
-- [x] Go to [adsense.google.com](https://adsense.google.com)
-
-- [x] Sign up and add your site
-
-- [x] Wait for approval (can take 1-2 weeks)
-
-- [x] Once approved, get your Publisher ID
-
-- [x] Add to environment variables:
-  ```env
-  GOOGLE_ADSENSE_ID=ca-pub-XXXXXXXXXX
-  ```
-
-  ```
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2466524479356522"
-     crossorigin="anonymous"></script>
-  ```
-
-### Google Search Console
-
-- [x] Go to [search.google.com/search-console](https://search.google.com/search-console)
-
-- [x] Add your property (domain)
-
-- [ ] Verify ownership via DNS TXT record
-```
-google-site-verification=o9iQ_GCfsWW72FIuRHkcU0Mkrd_xfJ9UopItEHn9XZw
-```
-
-- [ ] Submit your sitemap: `https://yourdomain.com/sitemap.xml`
+- [ ] **Add cookie consent banner** (lightweight, for future-proofing)
 
 ---
 
-## 5. Content Collection
+## 5. Initial Content Collection
+
+> **Goal**: Seed 30-40 high-quality deals before launch
 
 ### Research Local Discounts
 
@@ -195,6 +201,17 @@ google-site-verification=o9iQ_GCfsWW72FIuRHkcU0Mkrd_xfJ9UopItEHn9XZw
 
 - [ ] Check Syracuse University official resources
 
+### Deal Categorization
+
+- [ ] **Tag deals as "evergreen" vs "seasonal"**:
+  - Evergreen: Always available (Spotify, gym memberships)
+  - Seasonal: Limited time (back-to-school, finals week)
+
+- [ ] **Tag deals by proximity to campus**:
+  - On-campus
+  - Walking distance (< 10 min)
+  - Needs transportation
+
 ### National Student Discounts to Add
 
 - [ ] Spotify Premium Student ($5.99/mo)
@@ -210,7 +227,198 @@ google-site-verification=o9iQ_GCfsWW72FIuRHkcU0Mkrd_xfJ9UopItEHn9XZw
 
 ---
 
-## 6. Social Media & Marketing
+# Phase 3: Traffic & SEO (Post-Launch Week 1)
+
+## 6. Google Services
+
+### Google Analytics
+
+- [x] Go to [analytics.google.com](https://analytics.google.com)
+
+- [x] Create a new property for your domain
+
+- [x] Get your Measurement ID (starts with `G-`)
+
+- [x] Add to environment variables:
+  ```env
+  NEXT_PUBLIC_GA_MEASUREMENT_ID=G-FGZJKQVVZ4
+  ```
+
+### Google Search Console
+
+- [x] Go to [search.google.com/search-console](https://search.google.com/search-console)
+
+- [x] Add your property (domain)
+
+- [x] Verify ownership via DNS TXT record:
+  ```
+  google-site-verification=o9iQ_GCfsWW72FIuRHkcU0Mkrd_xfJ9UopItEHn9XZw
+  ```
+
+- [ ] **Submit your sitemap**: `https://orangediscounts.com/sitemap.xml`
+
+- [ ] **Request indexing** for key pages (homepage, category pages)
+
+### Analytics Hygiene
+
+- [ ] **Create baseline metrics document** (Day 0):
+  - Current page count
+  - Current deal count
+  - Initial traffic (will be 0)
+  - Screenshot of Search Console
+
+- [ ] **Define conversion events** to track:
+  - Deal view (click into deal page)
+  - Affiliate link click
+  - Deal submission started
+  - Newsletter signup
+
+---
+
+# Phase 4: Monetization (Week 2+)
+
+## 7. Google AdSense
+
+- [x] Go to [adsense.google.com](https://adsense.google.com)
+
+- [x] Sign up and add your site
+
+- [x] Wait for approval (can take 1-2 weeks)
+
+- [x] Once approved, get your Publisher ID
+
+- [x] Add to environment variables:
+  ```env
+  NEXT_PUBLIC_GOOGLE_ADSENSE_ID=ca-pub-XXXXXXXXXX
+  ```
+
+---
+
+## 8. Affiliate Programs
+
+### Amazon Associates
+
+- [x] Sign up at [affiliate-program.amazon.com](https://affiliate-program.amazon.com)
+- [x] Get your Associate Tag: `orangediscoun-20`
+- [x] Add to environment variables:
+  ```env
+  NEXT_PUBLIC_AMAZON_AFFILIATE_TAG=orangediscoun-20
+  ```
+
+### Other Affiliate Programs (Optional)
+
+- [ ] Apple Affiliate Program: [performance-partners.apple.com](https://performance-partners.apple.com)
+- [ ] Spotify has limited affiliate options - check current programs
+
+---
+
+## 9. Stripe Setup (For Featured Listings)
+
+> Required for businesses to pay for featured listing placements
+
+- [x] Go to [stripe.com](https://stripe.com) and create an account
+
+- [x] Get your API keys from **Developers** → **API Keys**:
+  - Publishable key: `pk_live_...` or `pk_test_...`
+  - Secret key: `sk_live_...` or `sk_test_...`
+
+- [ ] Create a Product for "Featured Listing" in **Products**:
+  - Set pricing (e.g., $29/month or $249/year)
+  - Note the Price ID: `price_...`
+
+- [ ] Set up Webhook endpoint:
+  - URL: `https://orangediscounts.com/api/webhooks/stripe`
+  - Events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`
+  - Get webhook signing secret: `whsec_...`
+
+- [ ] **Plan for manual overrides**:
+  - Create process to comp featured listings for early partners
+  - Document in admin procedures
+
+- [ ] **Plan for cancellations**:
+  - What happens when a business cancels?
+  - Grace period? Immediate removal?
+
+- [x] Add to environment variables:
+  ```env
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_xxxxxxxxxxxx
+  STRIPE_SECRET_KEY=sk_live_xxxxxxxxxxxx
+  STRIPE_WEBHOOK_SECRET=whsec_xxxxxxxxxxxx
+  STRIPE_FEATURED_PRICE_ID=price_xxxxxxxxxxxx
+  ```
+
+---
+
+# Phase 5: Scale & Operations (Month 2+)
+
+## 10. Email Setup
+
+### For Business Email
+
+- [ ] Set up email with your domain (Google Workspace or Zoho free tier)
+  - `hello@orangediscounts.com`
+  - `advertise@orangediscounts.com`
+
+### For Transactional Email
+
+- [ ] Sign up for [Resend](https://resend.com) (free tier: 3,000 emails/month)
+- [ ] Verify your domain
+- [ ] Get API key and add to environment variables:
+  ```env
+  RESEND_API_KEY=re_XXXXXXXXXX
+  ```
+
+---
+
+## 11. Error Tracking with Sentry
+
+> Recommended for production error monitoring
+
+- [ ] Go to [sentry.io](https://sentry.io) and create an account (free tier available)
+
+- [ ] Create a new project:
+  - Platform: **Next.js**
+  - Name: `cuse-student-deals`
+
+- [ ] Get your DSN from **Settings** → **Client Keys (DSN)**
+
+- [ ] Add to environment variables:
+  ```env
+  NEXT_PUBLIC_SENTRY_DSN=https://xxxx@xxxx.ingest.sentry.io/xxxx
+  SENTRY_AUTH_TOKEN=sntrys_xxxxxxxxxxxx
+  ```
+
+---
+
+## 12. Admin API Key (For Bulk Import)
+
+> Required to use the `/api/deals/import` endpoint
+
+- [ ] Generate a secure random string for admin access:
+  ```bash
+  openssl rand -base64 32
+  ```
+
+- [ ] Add to environment variables:
+  ```env
+  ADMIN_API_KEY=your-secure-random-string
+  ```
+
+- [ ] **Set up rate limiting** on admin endpoints (in code)
+
+- [ ] **Enable logging** for admin API usage
+
+- [ ] Use in API requests:
+  ```bash
+  curl -X POST https://orangediscounts.com/api/deals/import \
+    -H "Content-Type: application/json" \
+    -H "x-admin-key: your-secure-random-string" \
+    -d '{"deals": [...]}'
+  ```
+
+---
+
+## 13. Social Media & Marketing
 
 ### Create Social Accounts
 
@@ -233,129 +441,7 @@ google-site-verification=o9iQ_GCfsWW72FIuRHkcU0Mkrd_xfJ9UopItEHn9XZw
 
 ---
 
-## 7. Legal
-
-- [ ] Draft Privacy Policy (use a generator like [Termly](https://termly.io))
-- [ ] Draft Terms of Service
-- [ ] Add disclaimer about not being affiliated with Syracuse University
-- [ ] Review affiliate disclosure requirements (FTC)
-
----
-
-## 8. Email Setup (Optional)
-
-### For Business Email
-
-- [ ] Set up email with your domain (Google Workspace or Zoho free tier)
-  - `hello@cusestudentdeals.com`
-  - `advertise@cusestudentdeals.com`
-
-### For Transactional Email
-
-- [ ] Sign up for [Resend](https://resend.com) (free tier: 3,000 emails/month)
-- [ ] Verify your domain
-- [ ] Get API key and add to environment variables
-
----
-
-## 9. Stripe Setup (For Featured Listings)
-
-> Required for businesses to pay for featured listing placements
-
-- [ ] Go to [stripe.com](https://stripe.com) and create an account
-
-- [ ] Get your API keys from **Developers** → **API Keys**:
-  - Publishable key: `pk_live_...` or `pk_test_...`
-  - Secret key: `sk_live_...` or `sk_test_...`
-
-- [ ] Create a Product for "Featured Listing" in **Products**:
-  - Set pricing (e.g., $29/month or $249/year)
-  - Note the Price ID: `price_...`
-
-- [ ] Set up Webhook endpoint:
-  - URL: `https://yourdomain.com/api/webhooks/stripe`
-  - Events: `checkout.session.completed`, `customer.subscription.updated`
-  - Get webhook signing secret: `whsec_...`
-
-- [ ] Add to environment variables:
-  ```env
-  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_xxxxxxxxxxxx
-  STRIPE_SECRET_KEY=sk_live_xxxxxxxxxxxx
-  STRIPE_WEBHOOK_SECRET=whsec_xxxxxxxxxxxx
-  STRIPE_FEATURED_PRICE_ID=price_xxxxxxxxxxxx
-  ```
-
----
-
-## 10. Error Tracking with Sentry (Optional)
-
-> Recommended for production error monitoring
-
-- [ ] Go to [sentry.io](https://sentry.io) and create an account (free tier available)
-
-- [ ] Create a new project:
-  - Platform: **Next.js**
-  - Name: `cuse-student-deals`
-
-- [ ] Get your DSN from **Settings** → **Client Keys (DSN)**
-
-- [ ] Add to environment variables:
-  ```env
-  NEXT_PUBLIC_SENTRY_DSN=https://xxxx@xxxx.ingest.sentry.io/xxxx
-  SENTRY_AUTH_TOKEN=sntrys_xxxxxxxxxxxx
-  ```
-
----
-
-## 11. Admin API Key (For Bulk Import)
-
-> Required to use the `/api/deals/import` endpoint
-
-- [ ] Generate a secure random string for admin access:
-  ```bash
-  openssl rand -base64 32
-  ```
-
-- [ ] Add to environment variables:
-  ```env
-  ADMIN_API_KEY=your-secure-random-string
-  ```
-
-- [ ] Use in API requests:
-  ```bash
-  curl -X POST https://yourdomain.com/api/deals/import \
-    -H "Content-Type: application/json" \
-    -H "x-admin-key: your-secure-random-string" \
-    -d '{"deals": [...]}'
-  ```
-
----
-
-## 12. Affiliate Program Setup (Optional)
-
-> For earning commissions on referral links
-
-### Amazon Associates
-
-- [ ] Sign up at [affiliate-program.amazon.com](https://affiliate-program.amazon.com)
-- [ ] Get your Associate Tag (e.g., `cusestudent-20`)
-- [ ] Add to environment variables:
-  ```env
-  NEXT_PUBLIC_AMAZON_AFFILIATE_TAG=cusestudent-20
-  ```
-
-### Apple Affiliate Program
-
-- [ ] Apply at [performance-partners.apple.com](https://performance-partners.apple.com)
-- [ ] Get your affiliate token
-- [ ] Add to environment variables:
-  ```env
-  NEXT_PUBLIC_APPLE_AFFILIATE_TOKEN=at_xxxxxxxxxxxx
-  ```
-
----
-
-## Quick Reference: All Environment Variables
+# Quick Reference: All Environment Variables
 
 ```env
 # Required - Supabase (New Key Format - 2025+)
@@ -386,12 +472,29 @@ SENTRY_AUTH_TOKEN=sntrys_xxxxxxxxxxxx
 ADMIN_API_KEY=your-secure-random-string
 
 # Optional - Affiliate Programs
-NEXT_PUBLIC_AMAZON_AFFILIATE_TAG=cusestudent-20
-NEXT_PUBLIC_APPLE_AFFILIATE_TOKEN=at_xxxxxxxxxxxx
-NEXT_PUBLIC_SPOTIFY_REF=your-spotify-ref
+NEXT_PUBLIC_AMAZON_AFFILIATE_TAG=orangediscoun-20
 ```
 
-### Key Format Reference
+---
+
+# Launch Checklist
+
+**Before announcing publicly, verify:**
+
+- [ ] SSL certificate active (green padlock)
+- [ ] www redirect configured
+- [ ] 30+ quality deals seeded
+- [ ] Trust pages complete (About, How We Verify)
+- [ ] Contact email visible in footer
+- [ ] Sitemap submitted to Search Console
+- [ ] Analytics tracking verified
+- [ ] Mobile Lighthouse score > 85
+- [ ] Error monitoring enabled
+- [ ] Affiliate disclosures in place
+
+---
+
+# Key Format Reference
 
 | Key Type | Prefix | Usage | Expose in Browser? |
 |----------|--------|-------|-------------------|
