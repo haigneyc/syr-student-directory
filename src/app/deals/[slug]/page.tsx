@@ -7,6 +7,7 @@ import VerificationBadge from '@/components/VerificationBadge';
 import ShareButtons from '@/components/ShareButtons';
 import MapEmbed from '@/components/MapEmbed';
 import ExpirationBadge from '@/components/ExpirationBadge';
+import ReportIssueButton from '@/components/ReportIssueButton';
 import { isDealExpired } from '@/lib/expiration';
 
 interface DealPageProps {
@@ -281,12 +282,10 @@ export default async function DealPage({ params }: DealPageProps) {
                 />
                 <ExpirationBadge expiresAt={deal.expires_at} />
               </div>
-              <Link
-                href="/submit"
-                className="text-sm text-gray-500 hover:text-orange-600"
-              >
-                Report an issue with this deal
-              </Link>
+              <ReportIssueButton
+                dealSlug={deal.slug}
+                businessName={deal.business.name}
+              />
             </div>
           </div>
         </div>

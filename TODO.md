@@ -21,7 +21,7 @@
 - [ ] Add "Save Deal" functionality (requires auth)
 - [ ] Create email notification system for submissions
 - [x] Add deal sharing buttons (Twitter, Facebook, copy link)
-- [ ] Implement "Report Issue" functionality on deal pages
+- [x] Implement "Report Issue" functionality on deal pages
 
 ## Search & Discovery
 - [ ] Implement full-text search with Supabase
@@ -59,7 +59,7 @@
 
 ## Mobile Experience
 - [x] Add PWA manifest for "Add to Home Screen"
-- [ ] Implement service worker for offline support
+- [x] Implement service worker for offline support
 - [ ] Add pull-to-refresh on mobile
 
 ## Content

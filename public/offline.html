@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline - Cuse Student Deals</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: #f9fafb;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 400px;
+    }
+
+    .emoji {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 24px;
+      color: #111827;
+      margin-bottom: 12px;
+    }
+
+    p {
+      color: #6b7280;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .btn {
+      display: inline-block;
+      background-color: #ea580c;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background-color 0.2s;
+    }
+
+    .btn:hover {
+      background-color: #c2410c;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 32px;
+    }
+
+    .logo-icon {
+      font-size: 32px;
+    }
+
+    .logo-text {
+      font-size: 20px;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .tip {
+      margin-top: 32px;
+      padding: 16px;
+      background-color: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 8px;
+    }
+
+    .tip-title {
+      font-weight: 600;
+      color: #c2410c;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+
+    .tip-text {
+      font-size: 13px;
+      color: #9a3412;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <span class="logo-icon">🍊</span>
+      <span class="logo-text">Cuse Student Deals</span>
+    </div>
+
+    <div class="emoji">📡</div>
+
+    <h1>You're offline</h1>
+
+    <p>
+      It looks like you've lost your internet connection.
+      Don't worry — check your connection and try again.
+    </p>
+
+    <a href="/" class="btn" onclick="window.location.reload(); return false;">
+      Try Again
+    </a>
+
+    <div class="tip">
+      <p class="tip-title">Pro tip</p>
+      <p class="tip-text">
+        Add Cuse Student Deals to your home screen for quick access,
+        even when you're back online!
+      </p>
+    </div>
+  </div>
+</body>
+</html>
