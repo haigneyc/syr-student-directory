@@ -20,6 +20,24 @@ export default function AboutPage() {
         </p>
       </div>
 
+      {/* Who We Are */}
+      <section className="mb-12">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">Who We Are</h2>
+        <div className="bg-orange-50 rounded-xl border border-orange-200 p-6">
+          <p className="text-gray-700 leading-relaxed mb-4">
+            Cuse Student Deals was created by Syracuse locals who understand the
+            financial pressures students face. We&apos;ve been there — stretching every
+            dollar, searching Reddit for tips, and walking into businesses hoping
+            a discount exists.
+          </p>
+          <p className="text-gray-700 leading-relaxed">
+            We built this directory because we believe students deserve a reliable,
+            no-nonsense resource for finding real savings. No spam, no expired codes,
+            no fake offers — just verified discounts that actually work.
+          </p>
+        </div>
+      </section>
+
       {/* Mission */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">Our Mission</h2>
@@ -38,11 +56,19 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Verification Process */}
+      {/* Why Trust Us */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">
-          How We Verify Deals
+          Why Students Trust Us
         </h2>
+        <div className="bg-green-50 rounded-xl border border-green-200 p-6 mb-6">
+          <p className="text-gray-700 leading-relaxed">
+            We know scammy coupon sites have made students skeptical. That&apos;s why
+            we take verification seriously. Every deal on this site has been checked
+            with the business directly. If a deal stops working, students tell us
+            and we remove it immediately.
+          </p>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <div className="text-3xl mb-3">🔍</div>
@@ -68,6 +94,14 @@ export default function AboutPage() {
               they&apos;re still valid.
             </p>
           </div>
+        </div>
+        <div className="mt-4 text-center">
+          <Link
+            href="/how-we-verify"
+            className="text-orange-600 hover:text-orange-700 font-medium"
+          >
+            Learn more about our verification process →
+          </Link>
         </div>
       </section>
 
@@ -117,6 +151,26 @@ export default function AboutPage() {
               </p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Contact */}
+      <section className="mb-12">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">Get In Touch</h2>
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <p className="text-gray-600 leading-relaxed mb-4">
+            Have a question, found a broken deal, or want to suggest a business?
+            We&apos;d love to hear from you.
+          </p>
+          <a
+            href="mailto:syracuse.automation@gmail.com"
+            className="inline-flex items-center gap-2 text-orange-600 hover:text-orange-700 font-medium"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            syracuse.automation@gmail.com
+          </a>
         </div>
       </section>
 

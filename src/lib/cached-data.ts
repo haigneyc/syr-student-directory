@@ -302,7 +302,8 @@ export const getCategoryBySlugCached = unstable_cache(
 );
 
 /**
- * Search deals with short-lived caching (1 minute)
+ * Search deals with full-text search and short-lived caching (1 minute)
+ * Uses Postgres full-text search with weighted ranking when available
  */
 export const searchDealsCached = unstable_cache(
   async (query: string): Promise<DealWithRelations[]> => {
@@ -322,6 +323,39 @@ export const searchDealsCached = unstable_cache(
         .map(getMockDealWithRelations);
     }
 
+    // First try full-text search using the custom function
+    const { data: ftsData, error: ftsError } = await supabase.rpc(
+      'search_deals_fts',
+      { search_query: query }
+    );
+
+    if (!ftsError && ftsData && ftsData.length > 0) {
+      // Fetch full deal data with relations for the matched deals
+      const dealIds = ftsData.map((d: { id: string }) => d.id);
+      const { data, error } = await supabase
+        .from('deals')
+        .select(
+          `
+          *,
+          business:businesses(*),
+          category:categories(*)
+        `
+        )
+        .in('id', dealIds)
+        .eq('status', 'active');
+
+      if (!error && data) {
+        // Sort by the original FTS ranking
+        const idOrder = new Map<string, number>(
+          dealIds.map((id: string, index: number) => [id, index])
+        );
+        return (data as DealWithRelations[]).sort(
+          (a, b) => (idOrder.get(a.id) ?? 999) - (idOrder.get(b.id) ?? 999)
+        );
+      }
+    }
+
+    // Fallback to ILIKE search if FTS fails or returns no results
     const { data, error } = await supabase
       .from('deals')
       .select(

@@ -1,4 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import {
+  checkRateLimit,
+  getClientIdentifier,
+  createRateLimitHeaders,
+  REPORT_RATE_LIMIT,
+  ADMIN_RATE_LIMIT,
+} from '@/lib/rate-limit';
+import { logAdminAction } from '@/lib/admin-logger';
 
 interface ReportPayload {
   deal_slug: string;
@@ -12,6 +20,20 @@ interface ReportPayload {
 const reports: (ReportPayload & { id: string; created_at: string })[] = [];
 
 export async function POST(request: NextRequest) {
+  // Rate limit check to prevent abuse
+  const identifier = getClientIdentifier(request);
+  const rateLimitResult = checkRateLimit(identifier, 'reports', REPORT_RATE_LIMIT);
+
+  if (!rateLimitResult.allowed) {
+    return NextResponse.json(
+      { error: 'Too many reports. Please try again later.' },
+      {
+        status: 429,
+        headers: createRateLimitHeaders(rateLimitResult),
+      }
+    );
+  }
+
   try {
     const body: ReportPayload = await request.json();
 
@@ -76,7 +98,10 @@ export async function POST(request: NextRequest) {
         message: 'Report submitted successfully',
         id: report.id,
       },
-      { status: 201 }
+      {
+        status: 201,
+        headers: createRateLimitHeaders(rateLimitResult),
+      }
     );
   } catch (error) {
     console.error('Error processing report:', error);
@@ -87,7 +112,47 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
-  // Return reports for admin view (in production, add authentication)
-  return NextResponse.json({ reports, total: reports.length });
+export async function GET(request: NextRequest) {
+  // Check for admin authorization header
+  const authHeader = request.headers.get('x-admin-key');
+  const adminKey = process.env.ADMIN_API_KEY;
+
+  if (!adminKey || authHeader !== adminKey) {
+    return NextResponse.json(
+      { error: 'Unauthorized. Admin API key required.' },
+      { status: 401 }
+    );
+  }
+
+  // Rate limit check
+  const identifier = authHeader || getClientIdentifier(request);
+  const rateLimitResult = checkRateLimit(identifier, 'reports/list', ADMIN_RATE_LIMIT);
+
+  if (!rateLimitResult.allowed) {
+    return NextResponse.json(
+      { error: 'Rate limit exceeded. Please try again later.' },
+      {
+        status: 429,
+        headers: createRateLimitHeaders(rateLimitResult),
+      }
+    );
+  }
+
+  // Log admin view of reports
+  logAdminAction({
+    endpoint: '/api/reports',
+    method: 'GET',
+    ip: identifier,
+    action: 'view_reports',
+    details: { reportCount: reports.length },
+    success: true,
+    statusCode: 200,
+  });
+
+  return NextResponse.json(
+    { reports, total: reports.length },
+    {
+      headers: createRateLimitHeaders(rateLimitResult),
+    }
+  );
 }

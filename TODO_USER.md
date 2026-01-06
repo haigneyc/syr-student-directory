@@ -46,11 +46,10 @@
 
 ### Security Configuration
 
-- [ ] **Enable RLS (Row Level Security)** on all public tables
-  - Go to **Authentication** → **Policies**
-  - Enable RLS for: `deals`, `businesses`, `categories`
-  - Add read policies for public access
-  - Add write policies for authenticated/admin only
+- [x] **Enable RLS (Row Level Security)** on all public tables
+  - RLS is already enabled via `001_initial_schema.sql` migration
+  - Read policies for public access are configured
+  - Write policies for admin operations use service role key
 
 ### Get API Keys (New System - 2025+)
 
@@ -87,9 +86,9 @@
   - Enable Point-in-Time Recovery (PITR) if on Pro plan
   - Or ensure daily backups are enabled (free tier)
 
-- [ ] **Document recovery procedure** in a RECOVERY.md file
+- [x] **Document recovery procedure** in RECOVERY.md file
 
-- [ ] **Export schema snapshot** to repository for version control
+- [x] **Export schema snapshot** to repository (`supabase/schema_snapshot.sql`)
 
 <details>
 <summary>Using Legacy Keys (not recommended for new projects)</summary>
@@ -154,27 +153,27 @@ Legacy keys will be deprecated by late 2026. Plan to migrate to new keys.
 
 ### Create Trust Pages
 
-- [ ] **Update About page** with:
+- [x] **Update About page** with:
   - Who runs the site (name/team, Syracuse connection)
   - Why it exists (mission to help students save money)
   - Why students should trust it (verification process, no fake deals)
   - Clear disclaimer: "Not affiliated with Syracuse University"
 
-- [ ] **Create "How We Verify Deals" page** explaining:
+- [x] **Create "How We Verify Deals" page** explaining:
   - How deals are submitted
   - How deals are verified (visited in person, called business, etc.)
   - How often deals are re-verified
   - How to report incorrect/expired deals
 
-- [ ] **Add contact email to footer**: `hello@orangediscounts.com`
+- [x] **Add contact email to footer**: `syracuse.automation@gmail.com`
 
 ### Legal Pages
 
 - [x] Privacy Policy (created)
 - [x] Terms of Service (created)
-- [ ] **Add affiliate disclosure** (FTC requirement):
-  - Add disclosure on pages with affiliate links
-  - Example: "Some links may earn us a commission at no extra cost to you"
+- [x] **Add affiliate disclosure** (FTC requirement):
+  - Inline disclosure on affiliate links with tooltip
+  - "ad" label with info icon next to affiliate links
 
 - [ ] **Add cookie consent banner** (lightweight, for future-proofing)
 
@@ -307,7 +306,6 @@ Legacy keys will be deprecated by late 2026. Plan to migrate to new keys.
 
 ### Other Affiliate Programs (Optional)
 
-- [ ] Apple Affiliate Program: [performance-partners.apple.com](https://performance-partners.apple.com)
 - [ ] Spotify has limited affiliate options - check current programs
 
 ---
@@ -353,20 +351,123 @@ Legacy keys will be deprecated by late 2026. Plan to migrate to new keys.
 
 ## 10. Email Setup
 
+> **Strategy**: Use Resend for transactional email (reliable, developer-friendly) and Beehiiv for marketing/newsletter (handles compliance, list management).
+
 ### For Business Email
 
-- [ ] Set up email with your domain (Google Workspace or Zoho free tier)
-  - `hello@orangediscounts.com`
-  - `advertise@orangediscounts.com`
+- [x] Set up email
+  - `syrAIcuse.automation@gmail.com`
 
-### For Transactional Email
+### Transactional Email (Resend)
 
-- [ ] Sign up for [Resend](https://resend.com) (free tier: 3,000 emails/month)
-- [ ] Verify your domain
-- [ ] Get API key and add to environment variables:
+> Use for: submission confirmations, admin notifications, "deal approved" emails.
+> Why Resend: Excellent DX, simple API, no bloat, perfect for Next.js.
+
+- [x] Sign up for [Resend](https://resend.com) (free tier: 3,000 emails/month)
+
+- [x] **Verify your domain** in Resend dashboard:
+  - Go to **Domains** → **Add Domain**
+  - Add DNS records (SPF, DKIM, DMARC)
+  - Wait for verification (~5-10 minutes)
+
+- [x] Get API key and add to environment variables:
   ```env
   RESEND_API_KEY=re_XXXXXXXXXX
   ```
+
+- [ ] **Emails to Build (Phase 1 - just one to start):**
+
+  **Business Submission Confirmation** (send immediately after submission):
+  - Thank them for submitting
+  - Confirm receipt of their deal
+  - Set timeline: "We verify within 3–5 business days"
+  - Include contact email for questions
+
+  **Admin Notification** (send to you on new submission):
+  - Business name, contact info
+  - Deal details
+  - Link to review in admin
+
+### Marketing Email (Beehiiv)
+
+> Use for: weekly deals newsletter, student engagement.
+> Why Beehiiv: Strong discovery, referral features, handles compliance automatically.
+
+- [x] Sign up for [Beehiiv](https://beehiiv.com) (free tier available)
+
+- [x] **Configure publication settings:**
+  - Publication name: "Syracuse Student Deals"
+  - From email: Use Beehiiv's sending or connect custom domain
+  - Add physical mailing address (required for CAN-SPAM)
+
+- [ ] **Set up email lists** (keep it simple - 2 lists only):
+
+  **1. Students / Users List**
+  - Source: Footer signup, optional checkbox on deal submission
+  - Purpose: Weekly deals, seasonal announcements (Welcome Week, Finals)
+
+  **2. Businesses List**
+  - Source: Deal submission form, outreach responses
+  - Purpose: Listing confirmations, traffic updates, featured listing upsells
+  - **Keep separate from student list**
+
+- [x] **Connect signup forms:**
+  - Get Beehiiv API key from **Settings** → **API**
+  - Update footer signup to POST to Beehiiv API
+  - Add to environment variables:
+    ```env
+    BEEHIIV_API_KEY=xxxxxxxxxxxx
+    BEEHIIV_PUBLICATION_ID=pub_xxxxxxxxxxxx
+    ```
+
+- [ ] **Create welcome email** (automated on signup):
+  - Thank them for subscribing
+  - Set expectations (weekly emails)
+  - Maybe include 2-3 top deals
+
+- [ ] **Weekly Deals Newsletter Template** (repeatable, 15 min to write):
+  ```
+  Subject: This Week's Best Student Deals in Syracuse
+
+  [1-2 line intro]
+
+  🔥 Featured Deals
+  - Business – Deal
+  - Business – Deal
+
+  🍔 Food & Coffee
+  - Deal
+  - Deal
+
+  🎬 Entertainment / Services
+  - Deal
+
+  Submit a deal → [link]
+  ```
+
+### Email Compliance Checklist
+
+> Even early on, do this right to stay out of spam trouble.
+
+- [ ] **Marketing emails must include:**
+  - Unsubscribe link (Beehiiv handles automatically)
+  - Physical mailing address (Beehiiv handles automatically)
+
+- [ ] **Transactional emails should:**
+  - Not include marketing content
+  - Be clearly service-related (confirmations, notifications)
+  - Include business name and what triggered the email
+
+### DO NOT Build Yet
+
+> Only after 500+ student subscribers and 20-30 active listings:
+
+- ❌ Drip campaigns / multi-step funnels
+- ❌ Referral programs
+- ❌ Complex segmentation
+- ❌ Sponsored newsletter slots
+- ❌ Welcome Week email sequences
+- ❌ Business performance summaries
 
 ---
 
@@ -374,15 +475,15 @@ Legacy keys will be deprecated by late 2026. Plan to migrate to new keys.
 
 > Recommended for production error monitoring
 
-- [ ] Go to [sentry.io](https://sentry.io) and create an account (free tier available)
+- [x] Go to [sentry.io](https://sentry.io) and create an account (free tier available)
 
-- [ ] Create a new project:
+- [x] Create a new project:
   - Platform: **Next.js**
   - Name: `cuse-student-deals`
 
-- [ ] Get your DSN from **Settings** → **Client Keys (DSN)**
+- [x] Get your DSN from **Settings** → **Client Keys (DSN)**
 
-- [ ] Add to environment variables:
+- [x] Add to environment variables:
   ```env
   NEXT_PUBLIC_SENTRY_DSN=https://xxxx@xxxx.ingest.sentry.io/xxxx
   SENTRY_AUTH_TOKEN=sntrys_xxxxxxxxxxxx
@@ -404,9 +505,10 @@ Legacy keys will be deprecated by late 2026. Plan to migrate to new keys.
   ADMIN_API_KEY=your-secure-random-string
   ```
 
-- [ ] **Set up rate limiting** on admin endpoints (in code)
+- [x] **Set up rate limiting** on admin endpoints (implemented in `src/lib/rate-limit.ts`)
 
-- [ ] **Enable logging** for admin API usage
+- [x] **Enable logging** for admin API usage (implemented in `src/lib/admin-logger.ts`)
+  - View logs via `GET /api/admin/logs` with admin key
 
 - [ ] Use in API requests:
   ```bash
@@ -455,8 +557,12 @@ NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 # Optional - Ads
 NEXT_PUBLIC_GOOGLE_ADSENSE_ID=ca-pub-XXXXXXXXXX
 
-# Optional - Email (Transactional)
+# Optional - Email (Transactional - Resend)
 RESEND_API_KEY=re_XXXXXXXXXX
+
+# Optional - Email (Marketing - Beehiiv)
+BEEHIIV_API_KEY=xxxxxxxxxxxx
+BEEHIIV_PUBLICATION_ID=pub_xxxxxxxxxxxx
 
 # Optional - Payments (Stripe)
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_xxxxxxxxxxxx

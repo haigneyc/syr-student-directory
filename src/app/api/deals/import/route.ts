@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase';
+import {
+  checkRateLimit,
+  getClientIdentifier,
+  createRateLimitHeaders,
+  ADMIN_RATE_LIMIT,
+} from '@/lib/rate-limit';
+import { logAdminAction } from '@/lib/admin-logger';
 
 interface ImportDeal {
   title: string;
@@ -45,6 +52,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { error: 'Unauthorized. Admin API key required.' },
       { status: 401 }
+    );
+  }
+
+  // Rate limit check (using API key as identifier for admin routes)
+  const identifier = authHeader || getClientIdentifier(request);
+  const rateLimitResult = checkRateLimit(identifier, 'deals/import', ADMIN_RATE_LIMIT);
+
+  if (!rateLimitResult.allowed) {
+    return NextResponse.json(
+      { error: 'Rate limit exceeded. Please try again later.' },
+      {
+        status: 429,
+        headers: createRateLimitHeaders(rateLimitResult),
+      }
     );
   }
 
@@ -178,13 +199,43 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({
-      message: 'Import completed',
-      imported: results.success.length,
-      failed: results.errors.length,
-      results,
+    // Log successful import
+    logAdminAction({
+      endpoint: '/api/deals/import',
+      method: 'POST',
+      ip: identifier,
+      action: 'bulk_import',
+      details: {
+        imported: results.success.length,
+        failed: results.errors.length,
+      },
+      success: true,
+      statusCode: 200,
     });
+
+    return NextResponse.json(
+      {
+        message: 'Import completed',
+        imported: results.success.length,
+        failed: results.errors.length,
+        results,
+      },
+      {
+        headers: createRateLimitHeaders(rateLimitResult),
+      }
+    );
   } catch (error) {
+    // Log failed import
+    logAdminAction({
+      endpoint: '/api/deals/import',
+      method: 'POST',
+      ip: identifier,
+      action: 'bulk_import',
+      details: { error: String(error) },
+      success: false,
+      statusCode: 500,
+    });
+
     console.error('Import error:', error);
     return NextResponse.json(
       { error: 'Failed to process import' },

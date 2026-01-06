@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { DM_Sans, Outfit } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -8,7 +8,19 @@ import AdSense from '@/components/AdSense';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import MobileRefreshWrapper from '@/components/MobileRefreshWrapper';
 
-const inter = Inter({ subsets: ['latin'] });
+// Body font - clean, modern, highly readable
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  variable: '--font-dm-sans',
+  display: 'swap',
+});
+
+// Display font - bold, distinctive headlines
+const outfit = Outfit({
+  subsets: ['latin'],
+  variable: '--font-outfit',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://orangediscounts.com'),
@@ -53,8 +65,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} antialiased bg-gray-50`}>
+    <html lang="en" className={`${dmSans.variable} ${outfit.variable}`}>
+      <body className="font-sans antialiased">
         <GoogleAnalytics />
         <AdSense />
         <ServiceWorkerRegistration />

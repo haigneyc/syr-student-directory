@@ -1,11 +1,45 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getAllDealsCached } from '@/lib/cached-data';
+import {
+  checkRateLimit,
+  getClientIdentifier,
+  createRateLimitHeaders,
+  ADMIN_RATE_LIMIT,
+} from '@/lib/rate-limit';
+import { logAdminAction } from '@/lib/admin-logger';
 
 /**
  * Export all deals as JSON or CSV
  * GET /api/deals/export?format=json|csv
+ *
+ * Requires admin API key for authentication
  */
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
+  // Check for admin authorization header
+  const authHeader = request.headers.get('x-admin-key');
+  const adminKey = process.env.ADMIN_API_KEY;
+
+  if (!adminKey || authHeader !== adminKey) {
+    return NextResponse.json(
+      { error: 'Unauthorized. Admin API key required.' },
+      { status: 401 }
+    );
+  }
+
+  // Rate limit check
+  const identifier = authHeader || getClientIdentifier(request);
+  const rateLimitResult = checkRateLimit(identifier, 'deals/export', ADMIN_RATE_LIMIT);
+
+  if (!rateLimitResult.allowed) {
+    return NextResponse.json(
+      { error: 'Rate limit exceeded. Please try again later.' },
+      {
+        status: 429,
+        headers: createRateLimitHeaders(rateLimitResult),
+      }
+    );
+  }
+
   const { searchParams } = new URL(request.url);
   const format = searchParams.get('format') || 'json';
 
@@ -61,10 +95,22 @@ export async function GET(request: Request) {
 
       const csv = csvRows.join('\n');
 
+      // Log CSV export
+      logAdminAction({
+        endpoint: '/api/deals/export',
+        method: 'GET',
+        ip: identifier,
+        action: 'export_csv',
+        details: { dealCount: deals.length },
+        success: true,
+        statusCode: 200,
+      });
+
       return new NextResponse(csv, {
         headers: {
           'Content-Type': 'text/csv',
           'Content-Disposition': 'attachment; filename="deals-export.csv"',
+          ...createRateLimitHeaders(rateLimitResult),
         },
       });
     }
@@ -99,15 +145,38 @@ export async function GET(request: Request) {
       },
     }));
 
+    // Log JSON export
+    logAdminAction({
+      endpoint: '/api/deals/export',
+      method: 'GET',
+      ip: identifier,
+      action: 'export_json',
+      details: { dealCount: exportData.length },
+      success: true,
+      statusCode: 200,
+    });
+
     return NextResponse.json(
       { deals: exportData, count: exportData.length, exportedAt: new Date().toISOString() },
       {
         headers: {
           'Content-Disposition': 'attachment; filename="deals-export.json"',
+          ...createRateLimitHeaders(rateLimitResult),
         },
       }
     );
   } catch (error) {
+    // Log failed export
+    logAdminAction({
+      endpoint: '/api/deals/export',
+      method: 'GET',
+      ip: identifier,
+      action: 'export',
+      details: { error: String(error) },
+      success: false,
+      statusCode: 500,
+    });
+
     console.error('Export error:', error);
     return NextResponse.json({ error: 'Failed to export deals' }, { status: 500 });
   }

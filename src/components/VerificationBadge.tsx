@@ -1,19 +1,27 @@
+import Link from 'next/link';
 import { formatDate } from '@/lib/utils';
 
 interface VerificationBadgeProps {
   isVerified: boolean;
   verifiedAt: string | null;
+  size?: 'sm' | 'md';
+  showLink?: boolean;
 }
 
 export default function VerificationBadge({
   isVerified,
   verifiedAt,
+  size = 'sm',
+  showLink = false,
 }: VerificationBadgeProps) {
+  const iconSize = size === 'sm' ? 'w-3.5 h-3.5' : 'w-4 h-4';
+  const textSize = size === 'sm' ? 'text-xs' : 'text-sm';
+
   if (!isVerified) {
     return (
-      <span className="inline-flex items-center gap-1 text-xs text-gray-400">
+      <span className={`inline-flex items-center gap-1 ${textSize} text-gray-400`}>
         <svg
-          className="w-3.5 h-3.5"
+          className={iconSize}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -30,10 +38,10 @@ export default function VerificationBadge({
     );
   }
 
-  return (
-    <span className="inline-flex items-center gap-1 text-xs text-green-600">
+  const content = (
+    <>
       <svg
-        className="w-3.5 h-3.5"
+        className={iconSize}
         fill="currentColor"
         viewBox="0 0 20 20"
       >
@@ -43,7 +51,28 @@ export default function VerificationBadge({
           clipRule="evenodd"
         />
       </svg>
-      Verified {formatDate(verifiedAt)}
+      <span>
+        <span className="font-medium">Verified</span>{' '}
+        {formatDate(verifiedAt)}
+      </span>
+    </>
+  );
+
+  if (showLink) {
+    return (
+      <Link
+        href="/how-we-verify"
+        className={`inline-flex items-center gap-1.5 ${textSize} text-green-600 hover:text-green-700 transition-colors`}
+        title="Learn how we verify deals"
+      >
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <span className={`inline-flex items-center gap-1.5 ${textSize} text-green-600`}>
+      {content}
     </span>
   );
 }

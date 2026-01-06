@@ -37,10 +37,14 @@ export async function generateMetadata({
   const shortDescription = description.length > 155
     ? description.substring(0, 152) + '...'
     : description;
+  const canonicalUrl = `https://orangediscounts.com/categories/${slug}`;
 
   return {
     title: `${category.name} Student Discounts Near Syracuse University | Cuse Deals`,
     description: shortDescription,
+    alternates: {
+      canonical: canonicalUrl,
+    },
     keywords: [
       `${category.name.toLowerCase()} student discount syracuse`,
       `SU student ${category.name.toLowerCase()} deals`,
@@ -51,6 +55,7 @@ export async function generateMetadata({
       title: `${category.name} Student Discounts - Syracuse University`,
       description: shortDescription,
       type: 'website',
+      url: canonicalUrl,
     },
     twitter: {
       card: 'summary',

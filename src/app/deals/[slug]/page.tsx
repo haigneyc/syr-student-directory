@@ -9,6 +9,7 @@ import ShareButtons from '@/components/ShareButtons';
 import MapEmbed from '@/components/MapEmbed';
 import ExpirationBadge from '@/components/ExpirationBadge';
 import ReportIssueButton from '@/components/ReportIssueButton';
+import DealViewTracker from '@/components/DealViewTracker';
 import { isDealExpired } from '@/lib/expiration';
 
 interface DealPageProps {
@@ -36,14 +37,19 @@ export async function generateMetadata({
 
   const title = `${deal.discount_value} Off at ${deal.business.name} – Syracuse Student Discount`;
   const description = `Save at ${deal.business.name} with your Syracuse University student ID. ${deal.description}`;
+  const canonicalUrl = `https://orangediscounts.com/deals/${slug}`;
 
   return {
     title,
     description,
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
       title,
       description,
       type: 'article',
+      url: canonicalUrl,
     },
     twitter: {
       card: 'summary',
@@ -61,27 +67,100 @@ export default async function DealPage({ params }: DealPageProps) {
     notFound();
   }
 
-  // Schema.org structured data
+  // Schema.org structured data - LocalBusiness with Offer
   const schemaData = {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
+    '@id': `https://orangediscounts.com/deals/${deal.slug}#business`,
     name: deal.business.name,
-    address: deal.business.address,
-    telephone: deal.business.phone,
-    url: deal.business.website,
-    offers: {
+    address: deal.business.address
+      ? {
+          '@type': 'PostalAddress',
+          streetAddress: deal.business.address,
+          addressLocality: 'Syracuse',
+          addressRegion: 'NY',
+          addressCountry: 'US',
+        }
+      : undefined,
+    telephone: deal.business.phone || undefined,
+    url: deal.business.website || undefined,
+    geo: deal.business.latitude && deal.business.longitude
+      ? {
+          '@type': 'GeoCoordinates',
+          latitude: deal.business.latitude,
+          longitude: deal.business.longitude,
+        }
+      : undefined,
+    makesOffer: {
       '@type': 'Offer',
-      description: deal.title,
-      eligibleCustomerType: 'Student',
-      price: deal.discount_value,
+      '@id': `https://orangediscounts.com/deals/${deal.slug}#offer`,
+      name: deal.title,
+      description: deal.description,
+      eligibleCustomerType: {
+        '@type': 'BusinessEntityType',
+        name: 'Student',
+      },
+      priceSpecification: {
+        '@type': 'PriceSpecification',
+        price: 0,
+        priceCurrency: 'USD',
+        valueAddedTaxIncluded: true,
+      },
+      availability: isDealExpired(deal.expires_at)
+        ? 'https://schema.org/Discontinued'
+        : 'https://schema.org/InStock',
+      validFrom: deal.created_at || undefined,
+      validThrough: deal.expires_at || undefined,
+      offeredBy: {
+        '@type': 'LocalBusiness',
+        name: deal.business.name,
+      },
     },
+  };
+
+  // BreadcrumbList schema
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: 'https://orangediscounts.com',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: deal.category.name,
+        item: `https://orangediscounts.com/categories/${deal.category.slug}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: deal.business.name,
+        item: `https://orangediscounts.com/deals/${deal.slug}`,
+      },
+    ],
   };
 
   return (
     <>
+      {/* Analytics tracking */}
+      <DealViewTracker
+        dealSlug={deal.slug}
+        dealTitle={deal.title}
+        businessName={deal.business.name}
+        categoryName={deal.category.name}
+      />
+
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -274,19 +353,23 @@ export default async function DealPage({ params }: DealPageProps) {
               />
             </div>
 
-            {/* Footer */}
-            <div className="border-t border-gray-200 pt-6 mt-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <VerificationBadge
-                  isVerified={deal.is_verified}
-                  verifiedAt={deal.verified_at}
+            {/* Verification & Status Footer */}
+            <div className="border-t border-gray-200 pt-6 mt-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <VerificationBadge
+                    isVerified={deal.is_verified}
+                    verifiedAt={deal.verified_at}
+                    size="md"
+                    showLink
+                  />
+                  <ExpirationBadge expiresAt={deal.expires_at} />
+                </div>
+                <ReportIssueButton
+                  dealSlug={deal.slug}
+                  businessName={deal.business.name}
                 />
-                <ExpirationBadge expiresAt={deal.expires_at} />
               </div>
-              <ReportIssueButton
-                dealSlug={deal.slug}
-                businessName={deal.business.name}
-              />
             </div>
           </div>
         </div>
