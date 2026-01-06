@@ -39,7 +39,7 @@
 
 ## Monetization
 - [x] Integrate Google AdSense
-- [ ] Add affiliate link tracking
+- [x] Add affiliate link tracking
 - [ ] Create Stripe integration for featured listings
 - [ ] Build business dashboard for paid listings
 

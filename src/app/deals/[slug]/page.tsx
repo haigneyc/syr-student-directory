@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getAllDealsCached, getDealBySlugCached } from '@/lib/cached-data';
 import AdUnit from '@/components/AdUnit';
+import AffiliateLink from '@/components/AffiliateLink';
 import VerificationBadge from '@/components/VerificationBadge';
 import ShareButtons from '@/components/ShareButtons';
 import MapEmbed from '@/components/MapEmbed';
@@ -240,14 +241,14 @@ export default async function DealPage({ params }: DealPageProps) {
                     <span className="text-gray-400">🌐</span>
                     <div>
                       <p className="text-sm text-gray-500">Website</p>
-                      <a
+                      <AffiliateLink
                         href={deal.business.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        dealSlug={deal.slug}
+                        businessName={deal.business.name}
                         className="text-orange-600 hover:underline"
                       >
                         Visit Website →
-                      </a>
+                      </AffiliateLink>
                     </div>
                   </div>
                 )}
