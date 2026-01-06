@@ -16,8 +16,8 @@
 - [ ] Add connection pooling for production (Supabase connection limits)
 
 ## Features
-- [ ] Add Google Maps embed to deal pages
-- [ ] Implement deal expiration handling
+- [x] Add Google Maps embed to deal pages
+- [x] Implement deal expiration handling
 - [ ] Add "Save Deal" functionality (requires auth)
 - [ ] Create email notification system for submissions
 - [x] Add deal sharing buttons (Twitter, Facebook, copy link)

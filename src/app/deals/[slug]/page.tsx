@@ -5,6 +5,9 @@ import { getDealBySlug, getAllDeals } from '@/lib/data';
 import { formatDate } from '@/lib/utils';
 import VerificationBadge from '@/components/VerificationBadge';
 import ShareButtons from '@/components/ShareButtons';
+import MapEmbed from '@/components/MapEmbed';
+import ExpirationBadge from '@/components/ExpirationBadge';
+import { isDealExpired } from '@/lib/expiration';
 
 interface DealPageProps {
   params: Promise<{ slug: string }>;
@@ -96,8 +99,31 @@ export default async function DealPage({ params }: DealPageProps) {
           <span className="text-gray-900">{deal.business.name}</span>
         </nav>
 
+        {/* Expiration Warning */}
+        {deal.expires_at && isDealExpired(deal.expires_at) && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex items-center gap-3">
+            <svg
+              className="w-6 h-6 text-red-500 flex-shrink-0"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <div>
+              <p className="font-semibold text-red-800">This deal has expired</p>
+              <p className="text-sm text-red-600">
+                This offer is no longer available. Check back for new deals!
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Main Content */}
-        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+        <div className={`bg-white rounded-2xl border border-gray-200 overflow-hidden ${deal.expires_at && isDealExpired(deal.expires_at) ? 'opacity-75' : ''}`}>
           {/* Header */}
           <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-6 md:p-8">
             <div className="flex items-start justify-between gap-4">
@@ -226,15 +252,14 @@ export default async function DealPage({ params }: DealPageProps) {
                 )}
               </div>
 
-              {/* Map placeholder */}
-              {deal.business.latitude && deal.business.longitude && (
-                <div className="mt-6">
-                  <div className="bg-gray-100 rounded-lg h-48 flex items-center justify-center">
-                    <p className="text-gray-500">
-                      Map view (Google Maps integration coming soon)
-                    </p>
-                  </div>
-                </div>
+              {/* Map */}
+              {deal.business.address && (
+                <MapEmbed
+                  address={deal.business.address}
+                  businessName={deal.business.name}
+                  latitude={deal.business.latitude}
+                  longitude={deal.business.longitude}
+                />
               )}
             </div>
 
@@ -249,10 +274,13 @@ export default async function DealPage({ params }: DealPageProps) {
 
             {/* Footer */}
             <div className="border-t border-gray-200 pt-6 mt-4 flex items-center justify-between">
-              <VerificationBadge
-                isVerified={deal.is_verified}
-                verifiedAt={deal.verified_at}
-              />
+              <div className="flex items-center gap-3">
+                <VerificationBadge
+                  isVerified={deal.is_verified}
+                  verifiedAt={deal.verified_at}
+                />
+                <ExpirationBadge expiresAt={deal.expires_at} />
+              </div>
               <Link
                 href="/submit"
                 className="text-sm text-gray-500 hover:text-orange-600"

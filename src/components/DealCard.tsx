@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { DealWithRelations } from '@/types/database';
 import { formatDate } from '@/lib/utils';
+import { isDealExpired } from '@/lib/expiration';
 import VerificationBadge from './VerificationBadge';
+import ExpirationBadge from './ExpirationBadge';
 
 interface DealCardProps {
   deal: DealWithRelations;
@@ -9,12 +11,14 @@ interface DealCardProps {
 }
 
 export default function DealCard({ deal, featured = false }: DealCardProps) {
+  const isExpired = isDealExpired(deal.expires_at);
+
   return (
     <Link
       href={`/deals/${deal.slug}`}
       className={`block bg-white rounded-xl border border-gray-200 hover:border-orange-300 hover:shadow-lg transition-all ${
         featured ? 'ring-2 ring-orange-500 ring-opacity-50' : ''
-      }`}
+      } ${isExpired ? 'opacity-60' : ''}`}
     >
       <div className="p-5">
         {/* Header */}
@@ -50,10 +54,13 @@ export default function DealCard({ deal, featured = false }: DealCardProps) {
 
         {/* Footer */}
         <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-          <VerificationBadge
-            isVerified={deal.is_verified}
-            verifiedAt={deal.verified_at}
-          />
+          <div className="flex items-center gap-2">
+            <VerificationBadge
+              isVerified={deal.is_verified}
+              verifiedAt={deal.verified_at}
+            />
+            <ExpirationBadge expiresAt={deal.expires_at} />
+          </div>
           <span className="text-xs text-gray-400">
             {deal.redemption_method === 'show_id'
               ? 'Show ID'
