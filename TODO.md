@@ -7,7 +7,7 @@
 - [x] Configure client with `sb_publishable_` key for browser-safe operations
 - [x] Configure server client with `sb_secret_` key for API routes (never expose in browser)
 - [x] Update authorization approach (new keys are NOT JWTs - don't use Authorization header)
-- [ ] Test that secret key returns 401 when accidentally used client-side (security validation)
+- [x] Test that secret key returns 401 when accidentally used client-side (security validation)
 
 ### Data Layer
 - [x] Replace mock data functions with Supabase queries
