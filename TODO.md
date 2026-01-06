@@ -3,14 +3,14 @@
 ## Database Integration
 
 ### Supabase Client Setup (New API Key System - 2025+)
-- [ ] Create Supabase client library (`src/lib/supabase.ts`) using new key format
-- [ ] Configure client with `sb_publishable_` key for browser-safe operations
-- [ ] Configure server client with `sb_secret_` key for API routes (never expose in browser)
-- [ ] Update authorization approach (new keys are NOT JWTs - don't use Authorization header)
+- [x] Create Supabase client library (`src/lib/supabase.ts`) using new key format
+- [x] Configure client with `sb_publishable_` key for browser-safe operations
+- [x] Configure server client with `sb_secret_` key for API routes (never expose in browser)
+- [x] Update authorization approach (new keys are NOT JWTs - don't use Authorization header)
 - [ ] Test that secret key returns 401 when accidentally used client-side (security validation)
 
 ### Data Layer
-- [ ] Replace mock data functions with Supabase queries
+- [x] Replace mock data functions with Supabase queries
 - [ ] Add real-time subscription for new deals
 - [ ] Implement server-side data fetching with caching
 - [ ] Add connection pooling for production (Supabase connection limits)
@@ -26,8 +26,8 @@
 ## Search & Discovery
 - [ ] Implement full-text search with Supabase
 - [ ] Add search filters (category, discount type, verified only)
-- [ ] Create sitemap.xml for SEO
-- [ ] Add robots.txt configuration
+- [x] Create sitemap.xml for SEO
+- [x] Add robots.txt configuration
 - [ ] Implement OpenGraph images for social sharing
 
 ## Admin Features
@@ -50,7 +50,7 @@
 - [ ] Add email signup form to footer
 
 ## Performance & Quality
-- [ ] Add loading skeletons for better UX
+- [x] Add loading skeletons for better UX
 - [ ] Implement image optimization for business logos
 - [ ] Add error boundaries and fallback UI
 - [ ] Set up error tracking (Sentry)
@@ -68,3 +68,6 @@
 - [ ] Write SEO-optimized category descriptions
 - [ ] Add FAQ page
 - [ ] Create privacy policy and terms of service
+
+## Analytics & Tracking
+- [x] Add Google Analytics integration

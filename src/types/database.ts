@@ -1,4 +1,5 @@
 // Database types for Syracuse Student Directory
+// These types match the Supabase schema
 
 export type DiscountType = 'percentage' | 'fixed' | 'bogo' | 'special';
 export type RedemptionMethod = 'show_id' | 'online_code' | 'app';
@@ -11,7 +12,8 @@ export interface Category {
   name: string;
   slug: string;
   icon: string;
-  description: string;
+  description: string | null;
+  created_at: string;
 }
 
 export interface Business {
@@ -19,7 +21,7 @@ export interface Business {
   name: string;
   slug: string;
   logo_url: string | null;
-  address: string;
+  address: string | null;
   latitude: number | null;
   longitude: number | null;
   phone: string | null;

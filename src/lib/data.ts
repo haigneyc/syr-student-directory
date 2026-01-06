@@ -1,13 +1,27 @@
-// Mock data for development - will be replaced with Supabase queries
-import { Category, Business, Deal, DealWithRelations } from '@/types/database';
+// Data layer - Uses Supabase when available, falls back to mock data
+import { supabase } from './supabase';
+import type { Category, Business, Deal, DealWithRelations } from '@/types/supabase';
 
-export const categories: Category[] = [
+// Check if Supabase is configured
+const isSupabaseConfigured = () => {
+  return !!(
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+  );
+};
+
+// ============================================================================
+// MOCK DATA (Fallback when Supabase is not configured)
+// ============================================================================
+
+const mockCategories: Category[] = [
   {
     id: '1',
     name: 'Food & Drink',
     slug: 'food',
     icon: '🍕',
     description: 'Restaurants, cafes, and food delivery discounts',
+    created_at: '2024-01-01T00:00:00Z',
   },
   {
     id: '2',
@@ -15,6 +29,7 @@ export const categories: Category[] = [
     slug: 'retail',
     icon: '🛍️',
     description: 'Clothing, electronics, and shopping deals',
+    created_at: '2024-01-01T00:00:00Z',
   },
   {
     id: '3',
@@ -22,6 +37,7 @@ export const categories: Category[] = [
     slug: 'entertainment',
     icon: '🎬',
     description: 'Movies, events, and recreational activities',
+    created_at: '2024-01-01T00:00:00Z',
   },
   {
     id: '4',
@@ -29,6 +45,7 @@ export const categories: Category[] = [
     slug: 'services',
     icon: '✂️',
     description: 'Haircuts, gyms, phone repair, and more',
+    created_at: '2024-01-01T00:00:00Z',
   },
   {
     id: '5',
@@ -36,10 +53,11 @@ export const categories: Category[] = [
     slug: 'online',
     icon: '💻',
     description: 'Software, streaming, and digital subscriptions',
+    created_at: '2024-01-01T00:00:00Z',
   },
 ];
 
-export const businesses: Business[] = [
+const mockBusinesses: Business[] = [
   {
     id: '1',
     name: "Varsity Pizza",
@@ -138,7 +156,7 @@ export const businesses: Business[] = [
   },
 ];
 
-export const deals: Deal[] = [
+const mockDeals: Deal[] = [
   {
     id: '1',
     business_id: '1',
@@ -293,80 +311,287 @@ export const deals: Deal[] = [
   },
 ];
 
-// Helper functions to simulate database queries
-export function getAllDeals(): DealWithRelations[] {
-  return deals.map(deal => ({
-    ...deal,
-    business: businesses.find(b => b.id === deal.business_id)!,
-    category: categories.find(c => c.id === deal.category_id)!,
-  }));
-}
+// ============================================================================
+// HELPER FUNCTIONS (Mock data)
+// ============================================================================
 
-export function getDealBySlug(slug: string): DealWithRelations | undefined {
-  const deal = deals.find(d => d.slug === slug);
-  if (!deal) return undefined;
+function getMockDealWithRelations(deal: Deal): DealWithRelations {
   return {
     ...deal,
-    business: businesses.find(b => b.id === deal.business_id)!,
-    category: categories.find(c => c.id === deal.category_id)!,
+    business: mockBusinesses.find(b => b.id === deal.business_id)!,
+    category: mockCategories.find(c => c.id === deal.category_id)!,
   };
 }
 
+// ============================================================================
+// DATA FETCHING FUNCTIONS (Supabase with mock fallback)
+// ============================================================================
+
+export async function getAllDealsAsync(): Promise<DealWithRelations[]> {
+  if (!isSupabaseConfigured()) {
+    return mockDeals.map(getMockDealWithRelations);
+  }
+
+  const { data, error } = await supabase
+    .from('deals')
+    .select(`
+      *,
+      business:businesses(*),
+      category:categories(*)
+    `)
+    .eq('status', 'active')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching deals:', error);
+    return mockDeals.map(getMockDealWithRelations);
+  }
+
+  return data as DealWithRelations[];
+}
+
+export async function getDealBySlugAsync(slug: string): Promise<DealWithRelations | null> {
+  if (!isSupabaseConfigured()) {
+    const deal = mockDeals.find(d => d.slug === slug);
+    return deal ? getMockDealWithRelations(deal) : null;
+  }
+
+  const { data, error } = await supabase
+    .from('deals')
+    .select(`
+      *,
+      business:businesses(*),
+      category:categories(*)
+    `)
+    .eq('slug', slug)
+    .single();
+
+  if (error) {
+    console.error('Error fetching deal:', error);
+    const deal = mockDeals.find(d => d.slug === slug);
+    return deal ? getMockDealWithRelations(deal) : null;
+  }
+
+  return data as DealWithRelations;
+}
+
+export async function getDealsByCategoryAsync(categorySlug: string): Promise<DealWithRelations[]> {
+  if (!isSupabaseConfigured()) {
+    const category = mockCategories.find(c => c.slug === categorySlug);
+    if (!category) return [];
+    return mockDeals
+      .filter(d => d.category_id === category.id && d.status === 'active')
+      .map(getMockDealWithRelations);
+  }
+
+  const { data, error } = await supabase
+    .from('deals')
+    .select(`
+      *,
+      business:businesses(*),
+      category:categories!inner(*)
+    `)
+    .eq('category.slug', categorySlug)
+    .eq('status', 'active')
+    .order('is_featured', { ascending: false })
+    .order('verified_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching deals by category:', error);
+    const category = mockCategories.find(c => c.slug === categorySlug);
+    if (!category) return [];
+    return mockDeals
+      .filter(d => d.category_id === category.id && d.status === 'active')
+      .map(getMockDealWithRelations);
+  }
+
+  return data as DealWithRelations[];
+}
+
+export async function getFeaturedDealsAsync(): Promise<DealWithRelations[]> {
+  if (!isSupabaseConfigured()) {
+    return mockDeals
+      .filter(d => d.is_featured && d.status === 'active')
+      .map(getMockDealWithRelations);
+  }
+
+  const { data, error } = await supabase
+    .from('deals')
+    .select(`
+      *,
+      business:businesses(*),
+      category:categories(*)
+    `)
+    .eq('is_featured', true)
+    .eq('status', 'active')
+    .order('verified_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching featured deals:', error);
+    return mockDeals
+      .filter(d => d.is_featured && d.status === 'active')
+      .map(getMockDealWithRelations);
+  }
+
+  return data as DealWithRelations[];
+}
+
+export async function getLatestDealsAsync(limit: number = 6): Promise<DealWithRelations[]> {
+  if (!isSupabaseConfigured()) {
+    return mockDeals
+      .filter(d => d.status === 'active')
+      .sort((a, b) => new Date(b.verified_at || b.created_at).getTime() - new Date(a.verified_at || a.created_at).getTime())
+      .slice(0, limit)
+      .map(getMockDealWithRelations);
+  }
+
+  const { data, error } = await supabase
+    .from('deals')
+    .select(`
+      *,
+      business:businesses(*),
+      category:categories(*)
+    `)
+    .eq('status', 'active')
+    .order('verified_at', { ascending: false, nullsFirst: false })
+    .limit(limit);
+
+  if (error) {
+    console.error('Error fetching latest deals:', error);
+    return mockDeals
+      .filter(d => d.status === 'active')
+      .slice(0, limit)
+      .map(getMockDealWithRelations);
+  }
+
+  return data as DealWithRelations[];
+}
+
+export async function getAllCategoriesAsync(): Promise<Category[]> {
+  if (!isSupabaseConfigured()) {
+    return mockCategories;
+  }
+
+  const { data, error } = await supabase
+    .from('categories')
+    .select('*')
+    .order('name');
+
+  if (error) {
+    console.error('Error fetching categories:', error);
+    return mockCategories;
+  }
+
+  return data;
+}
+
+export async function getCategoryBySlugAsync(slug: string): Promise<Category | null> {
+  if (!isSupabaseConfigured()) {
+    return mockCategories.find(c => c.slug === slug) || null;
+  }
+
+  const { data, error } = await supabase
+    .from('categories')
+    .select('*')
+    .eq('slug', slug)
+    .single();
+
+  if (error) {
+    console.error('Error fetching category:', error);
+    return mockCategories.find(c => c.slug === slug) || null;
+  }
+
+  return data;
+}
+
+export async function searchDealsAsync(query: string): Promise<DealWithRelations[]> {
+  if (!isSupabaseConfigured()) {
+    const lowerQuery = query.toLowerCase();
+    return mockDeals
+      .filter(d =>
+        d.status === 'active' && (
+          d.title.toLowerCase().includes(lowerQuery) ||
+          d.description.toLowerCase().includes(lowerQuery) ||
+          mockBusinesses.find(b => b.id === d.business_id)?.name.toLowerCase().includes(lowerQuery)
+        )
+      )
+      .map(getMockDealWithRelations);
+  }
+
+  const { data, error } = await supabase
+    .from('deals')
+    .select(`
+      *,
+      business:businesses(*),
+      category:categories(*)
+    `)
+    .eq('status', 'active')
+    .or(`title.ilike.%${query}%,description.ilike.%${query}%`);
+
+  if (error) {
+    console.error('Error searching deals:', error);
+    return [];
+  }
+
+  return data as DealWithRelations[];
+}
+
+// ============================================================================
+// SYNCHRONOUS FUNCTIONS (For backwards compatibility - use mock data only)
+// These are kept for components that need synchronous data access
+// ============================================================================
+
+export function getAllDeals(): DealWithRelations[] {
+  return mockDeals.map(getMockDealWithRelations);
+}
+
+export function getDealBySlug(slug: string): DealWithRelations | undefined {
+  const deal = mockDeals.find(d => d.slug === slug);
+  return deal ? getMockDealWithRelations(deal) : undefined;
+}
+
 export function getDealsByCategory(categorySlug: string): DealWithRelations[] {
-  const category = categories.find(c => c.slug === categorySlug);
+  const category = mockCategories.find(c => c.slug === categorySlug);
   if (!category) return [];
-  return deals
+  return mockDeals
     .filter(d => d.category_id === category.id && d.status === 'active')
-    .map(deal => ({
-      ...deal,
-      business: businesses.find(b => b.id === deal.business_id)!,
-      category: category,
-    }));
+    .map(getMockDealWithRelations);
 }
 
 export function getFeaturedDeals(): DealWithRelations[] {
-  return deals
+  return mockDeals
     .filter(d => d.is_featured && d.status === 'active')
-    .map(deal => ({
-      ...deal,
-      business: businesses.find(b => b.id === deal.business_id)!,
-      category: categories.find(c => c.id === deal.category_id)!,
-    }));
+    .map(getMockDealWithRelations);
 }
 
 export function getLatestDeals(limit: number = 6): DealWithRelations[] {
-  return deals
+  return mockDeals
     .filter(d => d.status === 'active')
     .sort((a, b) => new Date(b.verified_at || b.created_at).getTime() - new Date(a.verified_at || a.created_at).getTime())
     .slice(0, limit)
-    .map(deal => ({
-      ...deal,
-      business: businesses.find(b => b.id === deal.business_id)!,
-      category: categories.find(c => c.id === deal.category_id)!,
-    }));
+    .map(getMockDealWithRelations);
 }
 
 export function getCategoryBySlug(slug: string): Category | undefined {
-  return categories.find(c => c.slug === slug);
+  return mockCategories.find(c => c.slug === slug);
 }
 
 export function getAllCategories(): Category[] {
-  return categories;
+  return mockCategories;
 }
 
 export function searchDeals(query: string): DealWithRelations[] {
   const lowerQuery = query.toLowerCase();
-  return deals
+  return mockDeals
     .filter(d =>
       d.status === 'active' && (
         d.title.toLowerCase().includes(lowerQuery) ||
         d.description.toLowerCase().includes(lowerQuery) ||
-        businesses.find(b => b.id === d.business_id)?.name.toLowerCase().includes(lowerQuery)
+        mockBusinesses.find(b => b.id === d.business_id)?.name.toLowerCase().includes(lowerQuery)
       )
     )
-    .map(deal => ({
-      ...deal,
-      business: businesses.find(b => b.id === deal.business_id)!,
-      category: categories.find(c => c.id === deal.category_id)!,
-    }));
+    .map(getMockDealWithRelations);
 }
+
+// Export mock data for seeding
+export { mockCategories as categories, mockBusinesses as businesses, mockDeals as deals };

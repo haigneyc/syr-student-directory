@@ -89,24 +89,24 @@ Legacy keys will be deprecated by late 2026. Plan to migrate to new keys.
 
 - [x] Go to [vercel.com](https://vercel.com) and sign up with GitHub
 
-- [ ] Click "Add New Project"
+- [x] Click "Add New Project"
 
-- [ ] Import your GitHub repository
+- [x] Import your GitHub repository
 
-- [ ] Add environment variables:
+- [x] Add environment variables:
   - `NEXT_PUBLIC_SUPABASE_URL`
   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
   - `SUPABASE_SECRET_KEY`
 
-- [ ] Click "Deploy"
+- [x] Click "Deploy"
 
 ### Configure Domain
 
-- [ ] After deployment, go to **Settings** → **Domains**
+- [x] After deployment, go to **Settings** → **Domains**
 
-- [ ] Add your custom domain
+- [x] Add your custom domain
 
-- [ ] Follow Vercel's instructions to update DNS records:
+- [x] Follow Vercel's instructions to update DNS records:
   - Add `A` record pointing to `76.76.21.21`
   - Add `CNAME` record for `www` pointing to `cname.vercel-dns.com`
 
@@ -118,15 +118,27 @@ Legacy keys will be deprecated by late 2026. Plan to migrate to new keys.
 
 ### Google Analytics (Optional)
 
-- [ ] Go to [analytics.google.com](https://analytics.google.com)
+- [x] Go to [analytics.google.com](https://analytics.google.com)
 
-- [ ] Create a new property for your domain
+- [x] Create a new property for your domain
 
-- [ ] Get your Measurement ID (starts with `G-`)
+- [x] Get your Measurement ID (starts with `G-`)
 
-- [ ] Add to environment variables:
+- [x] Add to environment variables:
   ```env
-  NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+  NEXT_PUBLIC_GA_MEASUREMENT_ID=G-FGZJKQVVZ4
+  ```
+
+  ```
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FGZJKQVVZ4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-FGZJKQVVZ4');
+</script>
   ```
 
 ### Google AdSense
