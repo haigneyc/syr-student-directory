@@ -54,7 +54,7 @@
 - [ ] Implement image optimization for business logos
 - [x] Add error boundaries and fallback UI
 - [ ] Set up error tracking (Sentry)
-- [ ] Add unit tests for utility functions
+- [x] Add unit tests for utility functions
 - [ ] Add E2E tests for critical paths (Playwright)
 
 ## Mobile Experience
