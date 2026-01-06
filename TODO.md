@@ -55,7 +55,7 @@
 - [x] Add error boundaries and fallback UI
 - [ ] Set up error tracking (Sentry)
 - [x] Add unit tests for utility functions
-- [ ] Add E2E tests for critical paths (Playwright)
+- [x] Add E2E tests for critical paths (Playwright)
 
 ## Mobile Experience
 - [x] Add PWA manifest for "Add to Home Screen"
