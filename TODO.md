@@ -34,7 +34,7 @@
 - [ ] Create admin authentication
 - [ ] Build admin dashboard for managing deals
 - [ ] Add deal approval workflow for submissions
-- [ ] Create bulk deal import/export
+- [x] Create bulk deal import/export
 - [ ] Add analytics dashboard (views, clicks, conversions)
 
 ## Monetization
