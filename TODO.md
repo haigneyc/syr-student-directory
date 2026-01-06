@@ -25,7 +25,7 @@
 
 ## Search & Discovery
 - [ ] Implement full-text search with Supabase
-- [ ] Add search filters (category, discount type, verified only)
+- [x] Add search filters (category, discount type, verified only)
 - [x] Create sitemap.xml for SEO
 - [x] Add robots.txt configuration
 - [x] Implement OpenGraph images for social sharing

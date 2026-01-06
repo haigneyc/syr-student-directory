@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { searchDeals } from '@/lib/data';
 import { DealWithRelations } from '@/types/database';
@@ -9,16 +9,19 @@ export default function SearchBar() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<DealWithRelations[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [totalResults, setTotalResults] = useState(0);
   const router = useRouter();
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (query.length >= 2) {
       const searchResults = searchDeals(query);
+      setTotalResults(searchResults.length);
       setResults(searchResults.slice(0, 5));
       setIsOpen(true);
     } else {
       setResults([]);
+      setTotalResults(0);
       setIsOpen(false);
     }
   }, [query]);
@@ -39,9 +42,22 @@ export default function SearchBar() {
     router.push(`/deals/${slug}`);
   };
 
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (query.length >= 2) {
+      setIsOpen(false);
+      router.push(`/search?q=${encodeURIComponent(query)}`);
+    }
+  };
+
+  const handleViewAll = () => {
+    setIsOpen(false);
+    router.push(`/search?q=${encodeURIComponent(query)}`);
+  };
+
   return (
     <div ref={wrapperRef} className="relative w-full max-w-xl">
-      <div className="relative">
+      <form onSubmit={handleSubmit} className="relative">
         <input
           type="text"
           value={query}
@@ -62,7 +78,7 @@ export default function SearchBar() {
             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
           />
         </svg>
-      </div>
+      </form>
 
       {/* Dropdown Results */}
       {isOpen && results.length > 0 && (
@@ -71,7 +87,7 @@ export default function SearchBar() {
             <button
               key={deal.id}
               onClick={() => handleSelect(deal.slug)}
-              className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 border-b border-gray-100 last:border-0"
+              className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 border-b border-gray-100"
             >
               <span className="text-xl">{deal.category.icon}</span>
               <div className="flex-1 min-w-0">
@@ -85,6 +101,14 @@ export default function SearchBar() {
               </span>
             </button>
           ))}
+          {totalResults > 5 && (
+            <button
+              onClick={handleViewAll}
+              className="w-full px-4 py-3 text-center text-orange-600 hover:bg-orange-50 font-medium text-sm border-t border-gray-100"
+            >
+              View all {totalResults} results
+            </button>
+          )}
         </div>
       )}
 
