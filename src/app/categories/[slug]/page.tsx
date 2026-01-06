@@ -2,14 +2,18 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import DealCard from '@/components/DealCard';
-import { getCategoryBySlug, getDealsByCategory, getAllCategories } from '@/lib/data';
+import {
+  getCategoryBySlugCached,
+  getDealsByCategoryCached,
+  getAllCategoriesCached,
+} from '@/lib/cached-data';
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
 }
 
 export async function generateStaticParams() {
-  const categories = getAllCategories();
+  const categories = await getAllCategoriesCached();
   return categories.map((category) => ({
     slug: category.slug,
   }));
@@ -19,7 +23,7 @@ export async function generateMetadata({
   params,
 }: CategoryPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const category = getCategoryBySlug(slug);
+  const category = await getCategoryBySlugCached(slug);
 
   if (!category) {
     return {
@@ -57,14 +61,17 @@ export async function generateMetadata({
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = await params;
-  const category = getCategoryBySlug(slug);
+
+  // Fetch data in parallel with caching
+  const [category, deals, categories] = await Promise.all([
+    getCategoryBySlugCached(slug),
+    getDealsByCategoryCached(slug),
+    getAllCategoriesCached(),
+  ]);
 
   if (!category) {
     notFound();
   }
-
-  const deals = getDealsByCategory(slug);
-  const categories = getAllCategories();
 
   // Schema.org structured data for category
   const schemaData = {

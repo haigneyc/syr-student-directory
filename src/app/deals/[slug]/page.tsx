@@ -1,8 +1,7 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { getDealBySlug, getAllDeals } from '@/lib/data';
-import { formatDate } from '@/lib/utils';
+import { getAllDealsCached, getDealBySlugCached } from '@/lib/cached-data';
 import VerificationBadge from '@/components/VerificationBadge';
 import ShareButtons from '@/components/ShareButtons';
 import MapEmbed from '@/components/MapEmbed';
@@ -15,7 +14,7 @@ interface DealPageProps {
 }
 
 export async function generateStaticParams() {
-  const deals = getAllDeals();
+  const deals = await getAllDealsCached();
   return deals.map((deal) => ({
     slug: deal.slug,
   }));
@@ -25,7 +24,7 @@ export async function generateMetadata({
   params,
 }: DealPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const deal = getDealBySlug(slug);
+  const deal = await getDealBySlugCached(slug);
 
   if (!deal) {
     return {
@@ -54,7 +53,7 @@ export async function generateMetadata({
 
 export default async function DealPage({ params }: DealPageProps) {
   const { slug } = await params;
-  const deal = getDealBySlug(slug);
+  const deal = await getDealBySlugCached(slug);
 
   if (!deal) {
     notFound();

@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllDeals, getDealsByCategory, searchDeals, getFeaturedDeals } from '@/lib/data';
+import {
+  getAllDealsCached,
+  getDealsByCategoryCached,
+  searchDealsCached,
+  getFeaturedDealsCached,
+} from '@/lib/cached-data';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -11,13 +16,13 @@ export async function GET(request: NextRequest) {
     let deals;
 
     if (featured === 'true') {
-      deals = getFeaturedDeals();
+      deals = await getFeaturedDealsCached();
     } else if (category) {
-      deals = getDealsByCategory(category);
+      deals = await getDealsByCategoryCached(category);
     } else if (query) {
-      deals = searchDeals(query);
+      deals = await searchDealsCached(query);
     } else {
-      deals = getAllDeals();
+      deals = await getAllDealsCached();
     }
 
     return NextResponse.json({ deals, count: deals.length });

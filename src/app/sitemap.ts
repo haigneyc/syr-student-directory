@@ -1,12 +1,14 @@
 import { MetadataRoute } from 'next';
-import { getAllCategories, getAllDeals } from '@/lib/data';
+import { getAllCategoriesCached, getAllDealsCached } from '@/lib/cached-data';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://orangediscounts.com';
 
-  // Get all categories and deals for dynamic routes
-  const categories = getAllCategories();
-  const deals = getAllDeals();
+  // Get all categories and deals for dynamic routes (cached)
+  const [categories, deals] = await Promise.all([
+    getAllCategoriesCached(),
+    getAllDealsCached(),
+  ]);
 
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [

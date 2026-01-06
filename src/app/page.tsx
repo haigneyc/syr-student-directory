@@ -3,21 +3,28 @@ import SearchBar from '@/components/SearchBar';
 import DealCard from '@/components/DealCard';
 import CategoryCard from '@/components/CategoryCard';
 import {
-  getAllCategories,
-  getFeaturedDeals,
-  getLatestDeals,
-  getDealsByCategory,
-} from '@/lib/data';
+  getAllCategoriesCached,
+  getFeaturedDealsCached,
+  getLatestDealsCached,
+  getDealsByCategoryCached,
+} from '@/lib/cached-data';
 
-export default function Home() {
-  const categories = getAllCategories();
-  const featuredDeals = getFeaturedDeals();
-  const latestDeals = getLatestDeals(6);
+export default async function Home() {
+  // Fetch data in parallel with caching
+  const [categories, featuredDeals, latestDeals] = await Promise.all([
+    getAllCategoriesCached(),
+    getFeaturedDealsCached(),
+    getLatestDealsCached(6),
+  ]);
 
-  // Get deal counts per category
-  const categoriesWithCounts = categories.map((cat) => ({
+  // Get deal counts per category in parallel
+  const categoryDeals = await Promise.all(
+    categories.map((cat) => getDealsByCategoryCached(cat.slug))
+  );
+
+  const categoriesWithCounts = categories.map((cat, index) => ({
     ...cat,
-    dealCount: getDealsByCategory(cat.slug).length,
+    dealCount: categoryDeals[index].length,
   }));
 
   return (
