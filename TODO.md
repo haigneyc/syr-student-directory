@@ -20,7 +20,7 @@
 - [ ] Implement deal expiration handling
 - [ ] Add "Save Deal" functionality (requires auth)
 - [ ] Create email notification system for submissions
-- [ ] Add deal sharing buttons (Twitter, Facebook, copy link)
+- [x] Add deal sharing buttons (Twitter, Facebook, copy link)
 - [ ] Implement "Report Issue" functionality on deal pages
 
 ## Search & Discovery
@@ -28,7 +28,7 @@
 - [ ] Add search filters (category, discount type, verified only)
 - [x] Create sitemap.xml for SEO
 - [x] Add robots.txt configuration
-- [ ] Implement OpenGraph images for social sharing
+- [x] Implement OpenGraph images for social sharing
 
 ## Admin Features
 - [ ] Create admin authentication
@@ -52,13 +52,13 @@
 ## Performance & Quality
 - [x] Add loading skeletons for better UX
 - [ ] Implement image optimization for business logos
-- [ ] Add error boundaries and fallback UI
+- [x] Add error boundaries and fallback UI
 - [ ] Set up error tracking (Sentry)
 - [ ] Add unit tests for utility functions
 - [ ] Add E2E tests for critical paths (Playwright)
 
 ## Mobile Experience
-- [ ] Add PWA manifest for "Add to Home Screen"
+- [x] Add PWA manifest for "Add to Home Screen"
 - [ ] Implement service worker for offline support
 - [ ] Add pull-to-refresh on mobile
 

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { getDealBySlug, getAllDeals } from '@/lib/data';
 import { formatDate } from '@/lib/utils';
 import VerificationBadge from '@/components/VerificationBadge';
+import ShareButtons from '@/components/ShareButtons';
 
 interface DealPageProps {
   params: Promise<{ slug: string }>;
@@ -237,8 +238,17 @@ export default async function DealPage({ params }: DealPageProps) {
               )}
             </div>
 
+            {/* Share */}
+            <div className="border-t border-gray-200 pt-6 mt-8">
+              <ShareButtons
+                url={`https://orangediscounts.com/deals/${deal.slug}`}
+                title={`${deal.discount_value} Off at ${deal.business.name} - Syracuse Student Discount`}
+                description={deal.description}
+              />
+            </div>
+
             {/* Footer */}
-            <div className="border-t border-gray-200 pt-6 mt-8 flex items-center justify-between">
+            <div className="border-t border-gray-200 pt-6 mt-4 flex items-center justify-between">
               <VerificationBadge
                 isVerified={deal.is_verified}
                 verifiedAt={deal.verified_at}

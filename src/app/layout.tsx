@@ -8,6 +8,7 @@ import GoogleAnalytics from '@/components/GoogleAnalytics';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://orangediscounts.com'),
   title: {
     default: 'Cuse Student Deals - Syracuse University Student Discounts',
     template: '%s | Cuse Student Deals',
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
     title: 'Cuse Student Deals - Syracuse University Student Discounts',
     description:
       'Every legit student discount in Syracuse — verified, local, and updated.',
-    url: 'https://cusestudentdeals.com',
+    url: 'https://orangediscounts.com',
     siteName: 'Cuse Student Deals',
     locale: 'en_US',
     type: 'website',
