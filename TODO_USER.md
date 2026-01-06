@@ -375,18 +375,18 @@ Legacy keys will be deprecated by late 2026. Plan to migrate to new keys.
   RESEND_API_KEY=re_XXXXXXXXXX
   ```
 
-- [ ] **Emails to Build (Phase 1 - just one to start):**
+- [x] **Emails Built (in `src/lib/resend.ts`):**
 
-  **Business Submission Confirmation** (send immediately after submission):
-  - Thank them for submitting
-  - Confirm receipt of their deal
-  - Set timeline: "We verify within 3–5 business days"
-  - Include contact email for questions
+  **Business Submission Confirmation** (sends automatically on submission):
+  - ✅ Thanks them for submitting
+  - ✅ Confirms receipt of their deal
+  - ✅ Sets timeline: "We verify within 3–5 business days"
+  - ✅ Includes contact email for questions
 
-  **Admin Notification** (send to you on new submission):
-  - Business name, contact info
-  - Deal details
-  - Link to review in admin
+  **Admin Notification** (sends automatically on submission):
+  - ✅ Business name, contact info
+  - ✅ Deal details
+  - ✅ Submission timestamp
 
 ### Marketing Email (Beehiiv)
 
