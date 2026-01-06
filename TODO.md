@@ -65,7 +65,7 @@
 ## Content
 - [ ] Gather 50+ real Syracuse student discounts
 - [ ] Create business logo assets
-- [ ] Write SEO-optimized category descriptions
+- [x] Write SEO-optimized category descriptions
 - [x] Add FAQ page
 - [x] Create privacy policy and terms of service
 

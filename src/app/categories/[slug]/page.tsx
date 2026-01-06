@@ -27,12 +27,30 @@ export async function generateMetadata({
     };
   }
 
+  // Truncate description for meta tags (150-160 chars ideal)
+  const description = category.description || `Find ${category.name.toLowerCase()} student discounts near Syracuse University.`;
+  const shortDescription = description.length > 155
+    ? description.substring(0, 152) + '...'
+    : description;
+
   return {
-    title: `${category.name} Student Discounts - Syracuse University`,
-    description: `Find ${category.name.toLowerCase()} student discounts near Syracuse University. ${category.description}`,
+    title: `${category.name} Student Discounts Near Syracuse University | Cuse Deals`,
+    description: shortDescription,
+    keywords: [
+      `${category.name.toLowerCase()} student discount syracuse`,
+      `SU student ${category.name.toLowerCase()} deals`,
+      `Syracuse University ${category.name.toLowerCase()}`,
+      `${category.name.toLowerCase()} near syracuse university`,
+    ],
     openGraph: {
       title: `${category.name} Student Discounts - Syracuse University`,
-      description: `Find ${category.name.toLowerCase()} student discounts near Syracuse University.`,
+      description: shortDescription,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary',
+      title: `${category.name} Student Discounts - Syracuse University`,
+      description: shortDescription,
     },
   };
 }
@@ -48,8 +66,39 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const deals = getDealsByCategory(slug);
   const categories = getAllCategories();
 
+  // Schema.org structured data for category
+  const schemaData = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: `${category.name} Student Discounts - Syracuse University`,
+    description: category.description,
+    url: `https://orangediscounts.com/categories/${category.slug}`,
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: deals.length,
+      itemListElement: deals.slice(0, 10).map((deal, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        item: {
+          '@type': 'Offer',
+          name: deal.title,
+          description: deal.description,
+          offeredBy: {
+            '@type': 'LocalBusiness',
+            name: deal.business.name,
+          },
+        },
+      })),
+    },
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
+      />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Breadcrumb */}
       <nav className="text-sm text-gray-500 mb-6">
         <Link href="/" className="hover:text-orange-600">
@@ -109,5 +158,6 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         </div>
       )}
     </div>
+    </>
   );
 }

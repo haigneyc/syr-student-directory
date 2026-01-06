@@ -20,7 +20,7 @@ const mockCategories: Category[] = [
     name: 'Food & Drink',
     slug: 'food',
     icon: '🍕',
-    description: 'Restaurants, cafes, and food delivery discounts',
+    description: 'Save on pizza, coffee, and restaurants near Syracuse University campus. From Marshall Street favorites to downtown eateries, find student discounts at local spots including Varsity Pizza, King David\'s, Faegan\'s, and more. Show your SU student ID and enjoy discounts on dine-in, takeout, and delivery orders.',
     created_at: '2024-01-01T00:00:00Z',
   },
   {
@@ -28,7 +28,7 @@ const mockCategories: Category[] = [
     name: 'Retail',
     slug: 'retail',
     icon: '🛍️',
-    description: 'Clothing, electronics, and shopping deals',
+    description: 'Student discounts on clothing, electronics, and everyday essentials. Shop smarter at stores near Syracuse University with exclusive SU student savings. Find deals on textbooks, dorm supplies, tech accessories, and fashion from both local shops and national retailers.',
     created_at: '2024-01-01T00:00:00Z',
   },
   {
@@ -36,7 +36,7 @@ const mockCategories: Category[] = [
     name: 'Entertainment',
     slug: 'entertainment',
     icon: '🎬',
-    description: 'Movies, events, and recreational activities',
+    description: 'Discounted movies, events, and activities for Syracuse students. Enjoy student pricing at local theaters, bowling alleys, escape rooms, and entertainment venues. Perfect for weekend outings, date nights, or group hangouts without breaking the budget.',
     created_at: '2024-01-01T00:00:00Z',
   },
   {
@@ -44,7 +44,7 @@ const mockCategories: Category[] = [
     name: 'Services',
     slug: 'services',
     icon: '✂️',
-    description: 'Haircuts, gyms, phone repair, and more',
+    description: 'Student discounts on haircuts, gym memberships, phone repair, and professional services near Syracuse University. Save money on grooming, fitness, and essential services with your SU student ID. Local barbers, salons, and fitness centers offer exclusive Orange pricing.',
     created_at: '2024-01-01T00:00:00Z',
   },
   {
@@ -52,7 +52,7 @@ const mockCategories: Category[] = [
     name: 'Online',
     slug: 'online',
     icon: '💻',
-    description: 'Software, streaming, and digital subscriptions',
+    description: 'Digital subscriptions and software at student prices. Access Spotify Premium, Amazon Prime Student, Adobe Creative Cloud, Microsoft Office, and streaming services with verified .edu email discounts. Save 50% or more on the apps and tools you use daily.',
     created_at: '2024-01-01T00:00:00Z',
   },
 ];
