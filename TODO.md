@@ -47,7 +47,7 @@
 - [ ] Set up email service (Resend, SendGrid, or similar)
 - [ ] Create welcome email for submissions
 - [ ] Build weekly deals newsletter
-- [ ] Add email signup form to footer
+- [x] Add email signup form to footer
 
 ## Performance & Quality
 - [x] Add loading skeletons for better UX
@@ -66,8 +66,8 @@
 - [ ] Gather 50+ real Syracuse student discounts
 - [ ] Create business logo assets
 - [ ] Write SEO-optimized category descriptions
-- [ ] Add FAQ page
-- [ ] Create privacy policy and terms of service
+- [x] Add FAQ page
+- [x] Create privacy policy and terms of service
 
 ## Analytics & Tracking
 - [x] Add Google Analytics integration
