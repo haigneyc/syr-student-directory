@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getAllDealsCached, getDealBySlugCached } from '@/lib/cached-data';
+import AdUnit from '@/components/AdUnit';
 import VerificationBadge from '@/components/VerificationBadge';
 import ShareButtons from '@/components/ShareButtons';
 import MapEmbed from '@/components/MapEmbed';
@@ -287,6 +288,11 @@ export default async function DealPage({ params }: DealPageProps) {
               />
             </div>
           </div>
+        </div>
+
+        {/* Ad Unit */}
+        <div className="mt-8">
+          <AdUnit slot="deal-page-bottom" format="horizontal" className="w-full" />
         </div>
 
         {/* CTA */}

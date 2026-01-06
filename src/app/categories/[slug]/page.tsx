@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import DealCard from '@/components/DealCard';
+import AdUnit from '@/components/AdUnit';
 import {
   getCategoryBySlugCached,
   getDealsByCategoryCached,
@@ -164,6 +165,11 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           </Link>
         </div>
       )}
+
+      {/* Ad Unit */}
+      <div className="mt-10">
+        <AdUnit slot="category-page-bottom" format="horizontal" className="w-full" />
+      </div>
     </div>
     </>
   );

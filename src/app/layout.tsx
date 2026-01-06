@@ -4,6 +4,7 @@ import './globals.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
+import AdSense from '@/components/AdSense';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import MobileRefreshWrapper from '@/components/MobileRefreshWrapper';
 
@@ -55,6 +56,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} antialiased bg-gray-50`}>
         <GoogleAnalytics />
+        <AdSense />
         <ServiceWorkerRegistration />
         <MobileRefreshWrapper>
           <div className="flex flex-col min-h-screen">

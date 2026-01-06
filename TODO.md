@@ -38,7 +38,7 @@
 - [ ] Add analytics dashboard (views, clicks, conversions)
 
 ## Monetization
-- [ ] Integrate Google AdSense
+- [x] Integrate Google AdSense
 - [ ] Add affiliate link tracking
 - [ ] Create Stripe integration for featured listings
 - [ ] Build business dashboard for paid listings
